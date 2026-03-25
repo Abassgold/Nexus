@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { FormEvent, useState } from 'react';
+
 import {
   MailIcon,
   LockIcon,
@@ -6,36 +7,66 @@ import {
   EyeIcon,
   EyeOffIcon,
   XIcon,
-  LoaderIcon } from
-'lucide-react';
+  LoaderIcon
+} from
+  'lucide-react';
+import { useAppDispatch } from '@/redux/hooks';
+import { trackTikTokEvent } from '@/lib/tiktok';
+import { addUser } from '@/redux/slice/auth';
+import { setToken } from '@/lib/token';
+import axios from 'axios';
+import { useNotification } from './notification/NotificationContext';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialTab: 'signin' | 'signup';
-  onAuthSuccess: (user: {username: string;email: string;}) => void;
+}
+
+export interface findUser {
+  email: string;
+  userName: string;
+  _id: string;
+  role?: string;
+};
+
+export interface AuthResponse {
+  ok: boolean;
+  user?: findUser;
+  token?: string;
+  msg?: string;
 }
 export function AuthModal({
   isOpen,
   onClose,
   initialTab,
-  onAuthSuccess
 }: AuthModalProps) {
   const [tab, setTab] = useState<'signin' | 'signup'>(initialTab);
+  const dispatch = useAppDispatch()
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   // Form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
+  const [userName, setUserName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [terms, setTerms] = useState(false);
+  const { notify } = useNotification();
   if (!isOpen) return null;
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const clearInput = () => {
+    setEmail('');
+    setPassword('');
+    setUserName('');
+    setConfirmPassword('');
+    setTerms(false)
+  }
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
+
     if (tab === 'signup') {
-      if (!username || !email || !password || !confirmPassword) {
+      if (!userName || !email || !password || !confirmPassword) {
         setError('All fields are required');
         return;
       }
@@ -57,15 +88,49 @@ export function AuthModal({
         return;
       }
     }
+
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      onAuthSuccess({
-        username: tab === 'signup' ? username : email.split('@')[0],
-        email
-      });
-    }, 1500);
+
+    try {
+      let data;
+
+      if (tab === 'signup') {
+        // Replace with your actual signup API call
+        data = await axios.post<AuthResponse>('/api/signup', {
+          userName,
+          email,
+          password,
+          confirmPassword
+        });
+        trackTikTokEvent('CompleteRegistration');
+      } else {
+        // Replace with your actual login API call
+        data = await axios.post<AuthResponse>(`/api/signin`, {
+          email,
+          password
+        });
+      }
+      // email: string;
+      // userName: string;
+      // _id: string;
+      // role ?: string;
+      // Only runs if the request succeeded
+      console.log('the data result ;', data.data)
+      if (!data.data.ok)
+        return;
+      clearInput();
+      dispatch(addUser(data.data.user!));
+      setToken(data.data.token ?? '');
+      notify('Registration successful!', 'success')
+      onClose();
+
+
+    } catch (err: any) {
+      // Show a meaningful error to the user
+      setError(err?.response?.data?.message ?? 'Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false); // always stop the loader
+    }
   };
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
@@ -108,28 +173,29 @@ export function AuthModal({
         {/* Form Body */}
         <div className="p-6">
           {error &&
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-sm text-red-500 text-xs font-medium">
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-sm text-red-500 text-xs font-medium">
               {error}
             </div>
           }
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {tab === 'signup' &&
-            <div>
+              <div>
                 <label className="block text-xs font-semibold text-txt-secondary mb-1.5 uppercase tracking-wider">
                   Username
                 </label>
                 <div className="relative">
                   <UserIcon
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted" />
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted" />
 
                   <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-surface-tertiary border border-border-subtle text-txt-primary text-sm rounded-sm py-2.5 pl-10 pr-4 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all placeholder:text-txt-muted"
-                  placeholder="johndoe" />
+                    type="text"
+                    required
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                    className="w-full bg-surface-tertiary border border-border-subtle text-txt-primary text-sm rounded-sm py-2.5 pl-10 pr-4 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all placeholder:text-txt-muted"
+                    placeholder="johndoe" />
 
                 </div>
               </div>
@@ -147,6 +213,7 @@ export function AuthModal({
                 <input
                   type="email"
                   value={email}
+                  required
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-surface-tertiary border border-border-subtle text-txt-primary text-sm rounded-sm py-2.5 pl-10 pr-4 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all placeholder:text-txt-muted"
                   placeholder="you@example.com" />
@@ -160,9 +227,9 @@ export function AuthModal({
                   Password
                 </label>
                 {tab === 'signin' &&
-                <a
-                  href="#"
-                  className="text-xs text-accent hover:text-accent-hover transition-colors">
+                  <a
+                    href="#"
+                    className="text-xs text-accent hover:text-accent-hover transition-colors">
 
                     Forgot Password?
                   </a>
@@ -186,40 +253,40 @@ export function AuthModal({
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-muted hover:text-txt-primary">
 
                   {showPassword ?
-                  <EyeOffIcon size={16} /> :
+                    <EyeOffIcon size={16} /> :
 
-                  <EyeIcon size={16} />
+                    <EyeIcon size={16} />
                   }
                 </button>
               </div>
             </div>
 
             {tab === 'signup' &&
-            <>
+              <>
                 <div>
                   <label className="block text-xs font-semibold text-txt-secondary mb-1.5 uppercase tracking-wider">
                     Confirm Password
                   </label>
                   <div className="relative">
                     <LockIcon
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted" />
+                      size={16}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted" />
 
                     <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full bg-surface-tertiary border border-border-subtle text-txt-primary text-sm rounded-sm py-2.5 pl-10 pr-4 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all placeholder:text-txt-muted"
-                    placeholder="••••••••" />
+                      type={showPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full bg-surface-tertiary border border-border-subtle text-txt-primary text-sm rounded-sm py-2.5 pl-10 pr-4 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all placeholder:text-txt-muted"
+                      placeholder="••••••••" />
 
                   </div>
                 </div>
                 <label className="flex items-start gap-2 cursor-pointer mt-2">
                   <input
-                  type="checkbox"
-                  checked={terms}
-                  onChange={(e) => setTerms(e.target.checked)}
-                  className="mt-1 w-4 h-4 rounded-sm border-border-subtle bg-surface-tertiary text-accent focus:ring-accent/30 focus:ring-offset-surface-secondary" />
+                    type="checkbox"
+                    checked={terms}
+                    onChange={(e) => setTerms(e.target.checked)}
+                    className="mt-1 w-4 h-4 rounded-sm border-border-subtle bg-surface-tertiary text-accent focus:ring-accent/30 focus:ring-offset-surface-secondary" />
 
                   <span className="text-xs text-txt-secondary leading-relaxed">
                     I agree to the{' '}
@@ -239,17 +306,17 @@ export function AuthModal({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-4 bg-accent text-surface-primary font-bold text-sm py-3 rounded-sm hover:bg-accent-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+              className="w-full mt-4 cursor-pointer bg-accent text-surface-primary font-bold text-sm py-3 rounded-sm hover:bg-accent-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
 
               {isLoading ?
-              <>
+                <>
                   <LoaderIcon size={16} className="animate-spin" />
                   {tab === 'signin' ? 'Signing in...' : 'Creating account...'}
                 </> :
-              tab === 'signin' ?
-              'Sign In' :
+                tab === 'signin' ?
+                  'Sign In' :
 
-              'Create Account'
+                  'Create Account'
               }
             </button>
           </form>
@@ -257,8 +324,8 @@ export function AuthModal({
           <div className="mt-6 text-center">
             <p className="text-sm text-txt-secondary">
               {tab === 'signin' ?
-              "Don't have an account? " :
-              'Already have an account? '}
+                "Don't have an account? " :
+                'Already have an account? '}
               <button
                 onClick={() => {
                   setTab(tab === 'signin' ? 'signup' : 'signin');
@@ -272,6 +339,7 @@ export function AuthModal({
           </div>
         </div>
       </div>
-    </div>);
+    </div>
+  );
 
 }

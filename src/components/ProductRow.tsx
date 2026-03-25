@@ -4,9 +4,8 @@ import { ShoppingCartIcon } from 'lucide-react';
 interface ProductRowProps {
   product: Product;
   index: number;
-  onBuyClick: (product: Product) => void;
 }
-export function ProductRow({ product, index, onBuyClick }: ProductRowProps) {
+export function ProductRow({ product, index}: ProductRowProps) {
   const isEven = index % 2 === 0;
   return (
     <div
@@ -56,7 +55,6 @@ export function ProductRow({ product, index, onBuyClick }: ProductRowProps) {
       <div className="flex items-center justify-end mt-2 md:mt-0">
         <button
           disabled={!product.inStock}
-          onClick={() => onBuyClick(product)}
           className={`
             flex items-center gap-2 px-4 py-1.5 rounded-sm text-xs font-semibold transition-all duration-150 w-full md:w-auto justify-center
             ${product.inStock ? 'bg-accent text-surface-primary hover:bg-accent-hover' : 'bg-surface-tertiary text-txt-muted cursor-not-allowed border border-border-subtle'}

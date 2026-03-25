@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import GlobalLayout from "@/components/GlobalLayout";
+import StoreProvider from "@/redux/StoreProvider";
+import { NotificationProvider } from "@/components/notification/NotificationContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +30,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <NotificationProvider>
+          <StoreProvider>
+            <GlobalLayout>
+              <main className="flex-1 w-full  max-w-7xl mx-auto px-4 md:px-6 pt-8 md:pt-12 pb-16 mb-8 mt-8">
+                {children}
+              </main>
+            </GlobalLayout>
+          </StoreProvider>
+        </NotificationProvider>
+
       </body>
     </html>
   );

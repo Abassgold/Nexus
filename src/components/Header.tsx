@@ -1,38 +1,43 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MenuIcon, XIcon, ShoppingBagIcon, LogOutIcon } from 'lucide-react';
 import { flatCategoryLinks } from '../data/mockData';
+import Link from 'next/link';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { clearUser } from '@/redux/slice/auth';
+import { deleteToken } from '@/lib/token';
+import { useNotification } from './notification/NotificationContext';
+
+
+
 interface HeaderProps {
   scrolled: boolean;
-  user: {
-    username: string;
-    email: string;
-  } | null;
-  cartCount: number;
   onLoginClick: () => void;
   onSignUpClick: () => void;
   onContactClick: () => void;
   onSupplierClick: () => void;
-  onCartClick: () => void;
-  onLogout: () => void;
   onCategorySelect: (category: string) => void;
 }
 export function Header({
   scrolled,
-  user,
-  cartCount,
   onLoginClick,
   onSignUpClick,
   onContactClick,
   onSupplierClick,
-  onCartClick,
-  onLogout,
-  onCategorySelect
 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleMobileNav = (action: () => void) => {
     action();
     setMobileMenuOpen(false);
   };
+  const { notify } = useNotification();
+  const dispatch = useAppDispatch();
+  const logOut = () => {
+    deleteToken()
+    dispatch(clearUser());
+    notify('Logged out successfully', 'info');
+
+  }
+  const user = useAppSelector((state) => state.auth);
   return (
     <>
       <header
@@ -45,10 +50,10 @@ export function Header({
           <div
             className="flex items-baseline gap-2 cursor-pointer"
             onClick={() =>
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth'
-            })
+              window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+              })
             }>
 
             <h1 className="font-heading font-bold text-xl text-txt-primary tracking-tight">
@@ -68,82 +73,58 @@ export function Header({
               Contact
             </button>
 
-            {user ?
-            <div className="flex items-center gap-4">
+            {user && user.userName ?
+              <div className="flex items-center gap-4">
                 <button
-                onClick={onSupplierClick}
-                className="text-xs font-semibold text-accent border border-accent/30 hover:border-accent hover:bg-accent/10 px-4 py-1.5 rounded-sm transition-all duration-150">
+                  onClick={onSupplierClick}
+                  className="text-xs font-semibold text-accent border border-accent/30 hover:border-accent hover:bg-accent/10 px-4 py-1.5 rounded-sm transition-all duration-150">
 
                   Supplier Dashboard
                 </button>
                 <div className="h-4 w-px bg-border-subtle mx-1"></div>
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent font-bold text-xs uppercase">
-                    {user.username.charAt(0)}
+                    {user.userName.charAt(0)}
                   </div>
-                  <span className="text-sm font-subheading text-txt-primary">
-                    {user.username}
+                  <span className="text-sm font-subheading text-txt-primary capitalized">
+                    {user.userName}
                   </span>
                 </div>
                 <button
-                onClick={onLogout}
-                className="text-txt-muted hover:text-red-500 transition-colors ml-2"
-                title="Logout">
+                  onClick={logOut}
+                  className="text-txt-muted hover:text-red-500 transition-colors ml-2"
+                  title="Logout">
 
                   <LogOutIcon size={16} />
                 </button>
               </div> :
 
-            <>
+              <>
                 <button
-                onClick={onLoginClick}
-                className="text-sm font-subheading text-txt-secondary hover:text-txt-primary transition-colors">
+                  onClick={onLoginClick}
+                  className="text-sm font-subheading text-txt-secondary hover:text-txt-primary transition-colors">
 
                   Login
                 </button>
                 <div className="h-4 w-px bg-border-subtle mx-2"></div>
                 <button
-                onClick={onSignUpClick}
-                className="text-xs font-semibold text-accent border border-accent/30 hover:border-accent hover:bg-accent/10 px-4 py-1.5 rounded-sm transition-all duration-150">
+                  onClick={onSignUpClick}
+                  className="text-xs font-semibold text-accent border border-accent/30 hover:border-accent hover:bg-accent/10 px-4 py-1.5 rounded-sm transition-all duration-150">
 
                   Sign Up
                 </button>
                 <button
-                onClick={onSupplierClick}
-                className="text-xs font-semibold bg-accent text-surface-primary hover:bg-accent-hover px-4 py-1.5 rounded-sm transition-all duration-150">
+                  onClick={onSupplierClick}
+                  className="text-xs font-semibold bg-accent text-surface-primary hover:bg-accent-hover px-4 py-1.5 rounded-sm transition-all duration-150">
 
                   Become a Supplier
                 </button>
               </>
             }
-
-            {/* Cart Button */}
-            <button
-              onClick={onCartClick}
-              className="relative text-txt-secondary hover:text-txt-primary transition-colors ml-2">
-
-              <ShoppingBagIcon size={20} />
-              {cartCount > 0 &&
-              <span className="absolute -top-1.5 -right-1.5 bg-accent text-surface-primary text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-surface-secondary">
-                  {cartCount}
-                </span>
-              }
-            </button>
           </nav>
 
           {/* Mobile Actions */}
           <div className="flex md:hidden items-center gap-4">
-            <button
-              onClick={onCartClick}
-              className="relative text-txt-secondary hover:text-txt-primary transition-colors">
-
-              <ShoppingBagIcon size={20} />
-              {cartCount > 0 &&
-              <span className="absolute -top-1.5 -right-1.5 bg-accent text-surface-primary text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-surface-secondary">
-                  {cartCount}
-                </span>
-              }
-            </button>
             <button
               className="text-txt-secondary hover:text-txt-primary"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -156,44 +137,44 @@ export function Header({
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen &&
-      <div className="fixed inset-0 top-14 z-40 bg-surface-primary border-t border-border-subtle animate-fade-in md:hidden flex flex-col overflow-y-auto pb-8">
+        <div className="fixed inset-0 top-14 z-40 bg-surface-primary border-t border-border-subtle animate-fade-in md:hidden flex flex-col overflow-y-auto pb-8">
           {/* User Section */}
-          {user ?
-        <div className="p-4 border-b border-border-subtle bg-surface-secondary flex items-center justify-between">
+          {user && user.userName ?
+            <div className="p-4 border-b border-border-subtle bg-surface-secondary flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent font-bold text-lg uppercase">
-                  {user.username.charAt(0)}
+                  {user.userName.charAt(0)}
                 </div>
                 <div>
-                  <div className="text-sm font-subheading text-txt-primary">
-                    {user.username}
+                  <div className="text-sm font-subheading text-txt-primary capitalized">
+                    {user.userName}
                   </div>
                   <div className="text-xs text-txt-secondary">{user.email}</div>
                 </div>
               </div>
               <button
-            onClick={() => handleMobileNav(onLogout)}
-            className="text-txt-muted hover:text-red-500 p-2">
+                onClick={() => handleMobileNav(logOut)}
+                className="text-txt-muted hover:text-red-500 p-2">
 
                 <LogOutIcon size={18} />
               </button>
             </div> :
 
-        <div className="p-4 border-b border-border-subtle grid grid-cols-2 gap-3">
+            <div className="p-4 border-b border-border-subtle grid grid-cols-2 gap-3">
               <button
-            onClick={() => handleMobileNav(onLoginClick)}
-            className="w-full text-sm font-semibold text-txt-primary bg-surface-tertiary border border-border-subtle px-4 py-2.5 rounded-sm">
+                onClick={() => handleMobileNav(onLoginClick)}
+                className="w-full text-sm font-semibold text-txt-primary bg-surface-tertiary border border-border-subtle px-4 py-2.5 rounded-sm">
 
                 Login
               </button>
               <button
-            onClick={() => handleMobileNav(onSignUpClick)}
-            className="w-full text-sm font-semibold text-accent border border-accent/30 px-4 py-2.5 rounded-sm">
+                onClick={() => handleMobileNav(onSignUpClick)}
+                className="w-full text-sm font-semibold text-accent border border-accent/30 px-4 py-2.5 rounded-sm">
 
                 Sign Up
               </button>
             </div>
-        }
+          }
 
           {/* Categories */}
           <div className="p-4">
@@ -202,34 +183,35 @@ export function Header({
             </h3>
             <div className="flex flex-col gap-1">
               {flatCategoryLinks.map((link) =>
-            <button
-              key={link}
-              onClick={() => handleMobileNav(() => onCategorySelect(link))}
-              className="text-left text-sm font-subheading text-txt-secondary hover:text-accent py-2.5 border-b border-border-subtle last:border-0">
-
-                  {link}
-                </button>
-            )}
+                <Link
+                  key={link.link}
+                  href={link.link}
+                  onClick={e => setMobileMenuOpen(false)}
+                  className="text-left text-sm font-subheading text-txt-secondary hover:text-accent py-2.5 border-b border-border-subtle last:border-0">
+                  {link.name}
+                </Link>
+              )}
             </div>
           </div>
 
           {/* Utilities */}
           <div className="p-4 mt-auto">
             <button
-            onClick={() => handleMobileNav(onContactClick)}
-            className="w-full text-left text-sm font-subheading text-txt-secondary hover:text-txt-primary py-3 border-b border-border-subtle">
+              onClick={() => handleMobileNav(onContactClick)}
+              className="w-full text-left text-sm font-subheading text-txt-secondary hover:text-txt-primary py-3 border-b border-border-subtle">
 
               Contact Support
             </button>
             <button
-            onClick={() => handleMobileNav(onSupplierClick)}
-            className="w-full mt-4 text-sm font-semibold bg-accent text-surface-primary px-4 py-3 rounded-sm">
+              onClick={() => handleMobileNav(onSupplierClick)}
+              className="w-full mt-4 text-sm font-semibold bg-accent text-surface-primary px-4 py-3 rounded-sm">
 
               Become a Supplier
             </button>
           </div>
         </div>
       }
-    </>);
+    </>
+  );
 
 }

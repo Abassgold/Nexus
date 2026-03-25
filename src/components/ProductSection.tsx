@@ -6,10 +6,9 @@ interface ProductSectionProps {
   title: string;
   products: Product[];
   accentLabel?: string;
-  onBuyClick: (product: Product) => void;
 }
 export const ProductSection = forwardRef<HTMLElement, ProductSectionProps>(
-  ({ title, products, accentLabel, onBuyClick }, ref) => {
+  ({ title, products, accentLabel}, ref) => {
     return (
       <section ref={ref} className="mb-8 scroll-mt-32">
         {/* Section Header */}
@@ -51,7 +50,7 @@ export const ProductSection = forwardRef<HTMLElement, ProductSectionProps>(
               key={product.id}
               product={product}
               index={idx}
-              onBuyClick={onBuyClick} />
+               />
 
             )}
           </div>

@@ -55,12 +55,15 @@ export const megaMenuCategories: Category[] = [
 
 
 export const flatCategoryLinks = [
-  'Accounts',
-  'Software',
-  'Gift Cards',
-  'Game Keys',
-  'VPN & Security',
-  'Subscriptions'];
+  {name:'Accounts', link:'/'},
+  {name:'Account Boosting', link:'/account-boosting'},
+  {name:'SMS Number', link:'/virtual-number'},
+  {name:'Software', link:'/software'},
+  {name:'Gift Cards', link:'/gift-cards'},
+  {name:'Game Keys', link:'/kame-keys'},
+  {name:'VPN & Security', link:'/security'},
+  {name:'Subscriptions', link:'/subscriptions'},
+];
 
 
 export const mockProductsAccounts: Product[] = [
