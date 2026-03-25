@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { MenuIcon, XIcon, ShoppingBagIcon, LogOutIcon } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { MenuIcon, XIcon, Palette, ShoppingCart, CreditCard, RotateCcw, FileText, LogOutIcon, UserIcon, ChevronDownIcon } from 'lucide-react';
 import { flatCategoryLinks } from '../data/mockData';
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
@@ -8,7 +8,14 @@ import { deleteToken } from '@/lib/token';
 import { useNotification } from './notification/NotificationContext';
 
 
-
+const Menu = [
+  { name: 'Profile', link: '/', icon: <UserIcon size={24}/> },
+  { name: 'Dashboard', link: '/dashboard', icon: <Palette size={24}/> },
+  { name: 'My Orders', link: '/orders', icon: <ShoppingCart size={24}/> },
+  { name: 'Add Funds', link: '/add-funds', icon: <CreditCard size={24}/> },
+  { name: 'Transaction History', link: '/transaction-history', icon: <RotateCcw size={24}/> },
+  { name: 'Balance History', link: '/balance-history', icon: <FileText size={24}/> },
+]
 interface HeaderProps {
   scrolled: boolean;
   onLoginClick: () => void;
@@ -25,6 +32,7 @@ export function Header({
   onSupplierClick,
 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobileUserOpen, setIsMobileUserOpen] = useState(false);
   const handleMobileNav = (action: () => void) => {
     action();
     setMobileMenuOpen(false);
@@ -35,8 +43,19 @@ export function Header({
     deleteToken()
     dispatch(clearUser());
     notify('Logged out successfully', 'info');
-
   }
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const user = useAppSelector((state) => state.auth);
   return (
     <>
@@ -82,21 +101,67 @@ export function Header({
                   Supplier Dashboard
                 </button>
                 <div className="h-4 w-px bg-border-subtle mx-1"></div>
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent font-bold text-xs uppercase">
-                    {user.userName.charAt(0)}
-                  </div>
-                  <span className="text-sm font-subheading text-txt-primary capitalized">
-                    {user.userName}
-                  </span>
-                </div>
-                <button
-                  onClick={logOut}
-                  className="text-txt-muted hover:text-red-500 transition-colors ml-2"
-                  title="Logout">
+                <div className="relative" ref={dropdownRef}>
 
-                  <LogOutIcon size={16} />
-                </button>
+                  {/* Trigger */}
+                  <button
+                    onClick={() => setIsOpen((prev) => !prev)}
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent font-bold text-xs uppercase">
+                      {user.userName.charAt(0)}
+                    </div>
+                    <span className="text-sm font-subheading text-txt-primary">
+                      {user.userName}
+                    </span>
+                    <ChevronDownIcon
+                      size={14}
+                      className={`text-txt-muted transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+
+                  {/* Dropdown */}
+                  {isOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-surface-elevated border border-border-subtle rounded-sm shadow-xl z-50">
+
+                      {/* User info */}
+                      <div className="px-4 py-3 border-b border-border-subtle">
+                        <p className="text-xs text-txt-muted">Signed in as</p>
+                        <p className="text-sm font-subheading text-txt-primary truncate">
+                          {user.userName}
+                        </p>
+                      </div>
+
+                      {/* Menu items */}
+                      <div className="py-1">
+                        {Menu.map((link, index) => (
+                          <Link
+                            key={index}
+                            href={link.link}
+                          >
+                            <button
+                              onClick={() => { setIsOpen(false); }}
+                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-txt-primary hover:bg-surface transition-colors"
+                            >
+                              {link.icon}
+                              {link.name}
+                            </button>
+                          </Link>
+                        ))}
+
+
+                        <button
+                          onClick={() => { logOut(); setIsOpen(false); }}
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-surface transition-colors"
+                        >
+                          <LogOutIcon size={14} />
+                          Logout
+                        </button>
+                      </div>
+
+                    </div>
+                  )}
+                </div>
               </div> :
 
               <>
@@ -135,46 +200,78 @@ export function Header({
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen &&
+      {mobileMenuOpen && (
         <div className="fixed inset-0 top-14 z-40 bg-surface-primary border-t border-border-subtle animate-fade-in md:hidden flex flex-col overflow-y-auto pb-8">
-          {/* User Section */}
-          {user && user.userName ?
-            <div className="p-4 border-b border-border-subtle bg-surface-secondary flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent font-bold text-lg uppercase">
-                  {user.userName.charAt(0)}
-                </div>
-                <div>
-                  <div className="text-sm font-subheading text-txt-primary capitalized">
-                    {user.userName}
-                  </div>
-                  <div className="text-xs text-txt-secondary">{user.email}</div>
-                </div>
-              </div>
+
+          {user && user.userName ? (
+            <div className="border-b border-border-subtle bg-surface-secondary">
+
+              {/* Trigger */}
               <button
-                onClick={() => handleMobileNav(logOut)}
-                className="text-txt-muted hover:text-red-500 p-2">
-
-                <LogOutIcon size={18} />
+                onClick={() => setIsMobileUserOpen((prev) => !prev)}
+                className="w-full flex items-center justify-between p-4 hover:bg-surface-tertiary transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent font-bold text-lg uppercase">
+                    {user.userName.charAt(0)}
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-subheading text-txt-primary capitalize">
+                      {user.userName}
+                    </div>
+                    <div className="text-xs text-txt-secondary">{user.email}</div>
+                  </div>
+                </div>
+                <ChevronDownIcon
+                  size={16}
+                  className={`text-txt-muted transition-transform duration-200 ${isMobileUserOpen ? 'rotate-180' : ''}`}
+                />
               </button>
-            </div> :
 
+              {/* Dropdown */}
+              {isMobileUserOpen && (
+                <div className="mx-4 mb-3 border border-border-subtle rounded-sm overflow-hidden">
+                  {Menu.map((link, index) => (
+                    <Link
+                      key={index}
+                      href={link.link}
+                    >
+                      <button
+                        onClick={() => handleMobileNav(() => { })}
+                        className="w-full flex items-center gap-2 px-4 py-3 text-sm text-txt-primary hover:bg-surface-elevated transition-colors"
+                      >
+                        {link.icon}
+                        {link.name}
+                      </button>
+                      <div className="border-t border-border-subtle" />
+                    </Link>
+                  ))}
+                  <button
+                    onClick={() => handleMobileNav(logOut)}
+                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-500 hover:bg-surface-elevated transition-colors"
+                  >
+                    <LogOutIcon size={15} />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
             <div className="p-4 border-b border-border-subtle grid grid-cols-2 gap-3">
               <button
                 onClick={() => handleMobileNav(onLoginClick)}
-                className="w-full text-sm font-semibold text-txt-primary bg-surface-tertiary border border-border-subtle px-4 py-2.5 rounded-sm">
-
+                className="w-full text-sm font-semibold text-txt-primary bg-surface-tertiary border border-border-subtle px-4 py-2.5 rounded-sm"
+              >
                 Login
               </button>
               <button
                 onClick={() => handleMobileNav(onSignUpClick)}
-                className="w-full text-sm font-semibold text-accent border border-accent/30 px-4 py-2.5 rounded-sm">
-
+                className="w-full text-sm font-semibold text-accent border border-accent/30 px-4 py-2.5 rounded-sm"
+              >
                 Sign Up
               </button>
             </div>
-          }
+          )}
 
           {/* Categories */}
           <div className="p-4">
@@ -182,15 +279,16 @@ export function Header({
               Categories
             </h3>
             <div className="flex flex-col gap-1">
-              {flatCategoryLinks.map((link) =>
+              {flatCategoryLinks.map((link) => (
                 <Link
                   key={link.link}
                   href={link.link}
-                  onClick={e => setMobileMenuOpen(false)}
-                  className="text-left text-sm font-subheading text-txt-secondary hover:text-accent py-2.5 border-b border-border-subtle last:border-0">
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-left text-sm font-subheading text-txt-secondary hover:text-accent py-2.5 border-b border-border-subtle last:border-0"
+                >
                   {link.name}
                 </Link>
-              )}
+              ))}
             </div>
           </div>
 
@@ -198,20 +296,20 @@ export function Header({
           <div className="p-4 mt-auto">
             <button
               onClick={() => handleMobileNav(onContactClick)}
-              className="w-full text-left text-sm font-subheading text-txt-secondary hover:text-txt-primary py-3 border-b border-border-subtle">
-
+              className="w-full text-left text-sm font-subheading text-txt-secondary hover:text-txt-primary py-3 border-b border-border-subtle"
+            >
               Contact Support
             </button>
             <button
               onClick={() => handleMobileNav(onSupplierClick)}
-              className="w-full mt-4 text-sm font-semibold bg-accent text-surface-primary px-4 py-3 rounded-sm">
-
+              className="w-full mt-4 text-sm font-semibold bg-accent text-surface-primary px-4 py-3 rounded-sm"
+            >
               Become a Supplier
             </button>
           </div>
+
         </div>
-      }
+      )}
     </>
   );
-
 }
