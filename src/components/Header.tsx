@@ -193,7 +193,6 @@ export function Header({
             <button
               className="text-txt-secondary hover:text-txt-primary"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-
               {mobileMenuOpen ? <XIcon size={20} /> : <MenuIcon size={20} />}
             </button>
           </div>
