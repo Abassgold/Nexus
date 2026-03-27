@@ -5,6 +5,7 @@ interface ProductRowProps {
   product: Product;
   index: number;
 }
+
 export function ProductRow({ product, index}: ProductRowProps) {
   const id = 3;
   const router = useRouter();
@@ -62,7 +63,6 @@ export function ProductRow({ product, index}: ProductRowProps) {
             flex items-center gap-2 px-4 py-1.5 cursor-pointer rounded-sm text-xs font-semibold transition-all duration-150 w-full md:w-auto justify-center
             ${product.inStock ? 'bg-accent text-surface-primary hover:bg-accent-hover' : 'bg-surface-tertiary text-txt-muted cursor-not-allowed border border-border-subtle'}
           `}>
-
           <ShoppingCartIcon size={14} />
           {product.inStock ? 'Buy Now' : 'Sold Out'}
         </button>

@@ -1,77 +1,67 @@
 'use client';
-import { ProductSection } from '@/components/ProductSection';
-import { PromoBanner } from '@/components/PromoBanner';
-import { mockProductsAccounts, mockProductsGameKeys, mockProductsGiftCards, mockProductsSoftware, mockProductsSubscriptions, mockProductsVPN} from '@/data/mockData';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
+import { Cat, getCategories } from "@/fetchApi/Social-Accounts";
+import Link from "next/link";
+import Image from 'next/image'
 
-function Home() {
-  const [scrolled, setScrolled] = useState(false);
 
-  const sectionRefs = useRef<{
-    [key: string]: HTMLElement | null;
-  }>({});
+const Home = () => {
+  const [categories, setCategories] = useState<Cat[]>([]);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+
+    const fetchCategories = async () => {
+      setLoading(true);
+      try {
+        const result = await getCategories();
+        setCategories(result ?? []);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      } finally { setLoading(false) }
+    };
+
+    fetchCategories();
+  }, [])
+
   return (
-    <>
-      <div className="mb-8 mt-8">
-        <h1 className="font-heading font-bold text-2xl md:text-3xl text-txt-primary tracking-tight mb-2">
-          Marketplace Overview
-        </h1>
-        <p className="text-sm text-txt-secondary font-body">
-          Browse our curated selection of premium digital assets and licenses.
-        </p>
+    <section id="faq" className=" ">
+      <div className="max-w-280 mx-auto px-4">
+        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-[#8a8a8a]  ">
+          Buy Social Accounts
+        </h2>
+        {loading ? (
+          <p className="text-center text-accent text-lg"> Loading...</p>
+        ) : (
+          <div className="space-y-4">
+            {categories.map((cat, index) => (
+              <div key={index} className=" cursor-pointer shadow-md overflow-hidden border rounded-sm bg-surface-secondary border-b border-border-subtle text-accent">
+                <Link
+                  key={cat.id}
+                  href={`/accounts/${cat.id}`}
+                  className="w-full flex justify-between items-center px-6 cursor-pointer py-4 text-left  font-medium text-sm sm:text-base  focus:outline-none"
+                >
+                  <div className="flex gap-2 items-center">
+                    <Image
+                      src={cat.image}
+                      width={30}
+                      height={30}
+                      alt="Picture of the author"
+                    />
+                    <span>{cat.title}</span>
+
+                  </div>
+                  <span><ArrowRight /></span>
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
+
       </div>
-
-      <ProductSection
-        ref={(el) => {
-          sectionRefs.current['Accounts'] = el;
-        }}
-        title="Accounts"
-        products={mockProductsAccounts}
-        accentLabel="HOT"
-      />
-
-      <PromoBanner />
-
-      <ProductSection
-        ref={(el) => { sectionRefs.current['Software'] = el }}
-        title="Software"
-        products={mockProductsSoftware}
-         />
-
-
-      <ProductSection
-        ref={(el) => { sectionRefs.current['Gift Cards'] = el }}
-        title="Gift Cards"
-        products={mockProductsGiftCards}
-        />
-
-
-      <ProductSection
-        ref={(el) => { sectionRefs.current['Game Keys'] = el }}
-        title="Game Keys"
-        products={mockProductsGameKeys}
-        />
-
-
-      <ProductSection
-        ref={(el) => { sectionRefs.current['VPN & Security'] = el }}
-        title="VPN & Security"
-        products={mockProductsVPN}
-         />
-
-
-      <ProductSection
-        ref={(el) => { sectionRefs.current['Subscriptions'] = el }}
-        title="Subscriptions"
-        products={mockProductsSubscriptions}
-        />
-    </>
+    </section>
   );
+};
 
-}
 export default Home;
