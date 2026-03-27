@@ -1,3 +1,4 @@
+import { Product } from '@/data/mockData';
 import axios from 'axios';
 
 const API_URL = `${process.env.NEXT_PUBLIC_ACCS_ZONE_BASE_URL}`;
@@ -17,34 +18,29 @@ export type Cat = {
 
 export interface Category {
   success: boolean;
-  data:Cat[]
+  data: Cat[]
 }
 
-export interface SubCategory {
+
+export type SubCat = {
   id: number;
-  name: string;
-  category_id: number;
-  [key: string]: unknown;
+  title: string;
+  slug?: string;
+}
+export interface SubCategory {
+  success: boolean;
+  data: {
+    category: SubCat,
+    subcategories: SubCat[]
+  }
 }
 
 export interface Listing {
-  id: number;
-  title: string;
-  slug: string;
-  total_price: number;
-  available_stock: number;
-  [key: string]: unknown;
+  success: boolean;
+  data: Product[];
 }
 
-export interface ListingsParams {
-  category_id?: number;
-  subcategory_id?: number;
-  search?: string;
-  sort?: 'sort_key' | 'total_price' | 'available_stock' | 'title';
-  direction?: 'asc' | 'desc';
-  per_page?: number;
-  page?: number;
-}
+
 
 export interface PurchasePayload {
   ad_id: number;
@@ -67,22 +63,28 @@ export const getCategories = async (): Promise<Cat[]> => {
   return data.data;
 };
 
-export const getSubCategories = async (id: number): Promise<SubCategory[]> => {
-  const { data } = await axios.get<SubCategory[]>(
+export const getSubCategories = async (id: number): Promise<SubCat[]> => {
+  const { data } = await axios.get<SubCategory>(
     `${API_URL}/categories/${id}/subcategories`,
     { headers }
   );
   console.log('the sub-categories: ', data)
 
-  return data;
+  return data.data.subcategories;
 };
 
-export const getListings = async (params?: ListingsParams): Promise<Listing[]> => {
-  const { data } = await axios.get<Listing[]>(`${API_URL}/listings`, {
+export const getListings = async (category_id: number, subcategory_id: number): Promise<Product[]> => {
+  const params = {
+    category_id,
+    subcategory_id,
+  };
+
+  const { data } = await axios.get<Listing>(`${API_URL}/listings`, {
     headers,
     params,
   });
-  return data;
+
+  return data.data;
 };
 
 export const getListingBySlug = async (slug: string): Promise<Listing> => {

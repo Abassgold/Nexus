@@ -39,7 +39,7 @@ const Home = () => {
               <div key={index} className="cursor-pointer shadow-md overflow-hidden border rounded-sm bg-surface-secondary border-b border-border-subtle text-accent">
                 <Link
                   key={cat.id}
-                  href={`/accounts/${cat.id}`}
+                  href={`/accounts`}
                   className="w-full flex justify-between items-center px-6 cursor-pointer py-3 text-left  font-medium text-sm md:text-base  focus:outline-none"
                 >
                   <div className="flex gap-2 items-center">
