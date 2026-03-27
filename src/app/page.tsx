@@ -36,23 +36,24 @@ const Home = () => {
         ) : (
           <div className="space-y-4">
             {categories.map((cat, index) => (
-              <div key={index} className=" cursor-pointer shadow-md overflow-hidden border rounded-sm bg-surface-secondary border-b border-border-subtle text-accent">
+              <div key={index} className="cursor-pointer shadow-md overflow-hidden border rounded-sm bg-surface-secondary border-b border-border-subtle text-accent">
                 <Link
                   key={cat.id}
                   href={`/accounts/${cat.id}`}
-                  className="w-full flex justify-between items-center px-6 cursor-pointer py-4 text-left  font-medium text-sm sm:text-base  focus:outline-none"
+                  className="w-full flex justify-between items-center px-6 cursor-pointer py-3 text-left  font-medium text-sm md:text-base  focus:outline-none"
                 >
                   <div className="flex gap-2 items-center">
                     <Image
+                    className="rounded-md"
                       src={cat.image}
-                      width={30}
-                      height={30}
-                      alt="Picture of the author"
+                      width={25}
+                      height={25}
+                      alt={cat.slug}
                     />
                     <span>{cat.title}</span>
 
                   </div>
-                  <span><ArrowRight /></span>
+                  <span><ArrowRight size={15}/></span>
                 </Link>
               </div>
             ))}
