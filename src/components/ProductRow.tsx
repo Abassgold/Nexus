@@ -7,7 +7,7 @@ interface ProductRowProps {
   index: number;
 }
 
-export function ProductRow({ product, index}: ProductRowProps) {
+export function ProductRow({ product, index }: ProductRowProps) {
   const id = 3;
   const router = useRouter();
   const isEven = index % 2 === 0;
@@ -21,44 +21,40 @@ export function ProductRow({ product, index}: ProductRowProps) {
     `}>
 
       {/* Product Info */}
-      <div className="flex items-center gap-4">
+      <div className="flex md:items-center gap-4">
         <div className="w-10 h-10 shrink-0 bg-surface-tertiary border border-border-subtle rounded-sm flex items-center justify-center text-txt-muted font-heading font-bold text-lg">
           {product.title.charAt(0)}
         </div>
         <div className="min-w-0">
-          <h3 className="font-subheading font-medium text-sm text-txt-primary truncate md:text-wrap">
+          <p className="font-subheading md:font-medium text-sm text-txt-primary">
             {product.title}
-          </h3>
-          <p className="text-xs text-txt-secondary truncate mt-0.5 font-body">
-            {product.slug}
           </p>
         </div>
       </div>
 
       {/* Stock */}
-      <div className="flex items-center md:justify-start">
-        <span
-          className={`
+      <div className='flex gap-2 items-center md:justify-between'>
+        <div className="flex items-center md:justify-start">
+          <span
+            className={`
           inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wider
           ${product.available_stock > 0 ? 'bg-stock-green/10 text-stock-green border border-stock-green/20' : 'bg-stock-grey/10 text-stock-grey border border-stock-grey/20'}
         `}>
-
-          {product.available_stock > 0 ? `${product.available_stock} in stock` : 'Out of stock'}
-        </span>
+            {product.available_stock > 0 ? `${product.available_stock} in stock` : 'Out of stock'}
+          </span>
+        </div>
+        {/* Price */}
+        <div className="flex items-center md:justify-start">
+          <span className="text-xs text-txt-secondary mr-1">from</span>
+          <span className="font-subheading font-medium text-sm text-accent">
+            ${parseFloat(product.price)}
+          </span>
+        </div>
       </div>
-
-      {/* Price */}
-      <div className="flex items-center md:justify-start">
-        <span className="text-xs text-txt-secondary mr-1">from</span>
-        <span className="font-subheading font-medium text-sm text-accent">
-          ${parseFloat(product.price)}
-        </span>
-      </div>
-
       {/* Action */}
       <div className="flex items-center justify-end mt-2 md:mt-0">
         <button
-        onClick={e=>router.push(`/acc_details`)}
+          onClick={e => router.push(`/acc_details`)}
           disabled={product.available_stock <= 0}
           className={`
             flex items-center gap-2 px-4 py-1.5 cursor-pointer rounded-sm text-xs font-semibold transition-all duration-150 w-full md:w-auto justify-center
@@ -68,6 +64,7 @@ export function ProductRow({ product, index}: ProductRowProps) {
           {product.available_stock > 0 ? 'Buy Now' : 'Sold Out'}
         </button>
       </div>
-    </div>);
+    </div>
+  );
 
 }

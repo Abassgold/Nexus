@@ -16,7 +16,7 @@ export const ProductSection = forwardRef<HTMLElement, ProductSectionProps>(
       <section ref={ref} className="mb-8 scroll-mt-32">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <h2 className="font-heading font-bold text-lg text-txt-primary tracking-tight">
+            <h2 className="font-heading font-semibold md:font-bold  md:text-lg text-txt-primary tracking-tight">
               {title}
             </h2>
             {accentLabel && (
