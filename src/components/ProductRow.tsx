@@ -25,7 +25,9 @@ export function ProductRow({ product, index }: ProductRowProps) {
         <div className="w-10 h-10 shrink-0 bg-surface-tertiary border border-border-subtle rounded-sm flex items-center justify-center text-txt-muted font-heading font-bold text-lg">
           {product.title.charAt(0)}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0"
+        title={product.slug}
+        >
           <p className="font-subheading md:font-medium text-sm text-txt-primary">
             {product.title}
           </p>
