@@ -1,11 +1,12 @@
+'use client';
 import { useEffect, useRef, useState } from 'react';
 import { MenuIcon, XIcon, Palette, ShoppingCart, CreditCard, RotateCcw, FileText, LogOutIcon, UserIcon, ChevronDownIcon } from 'lucide-react';
-import { flatCategoryLinks } from '../data/mockData';
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { clearUser } from '@/redux/slice/auth';
 import { deleteToken } from '@/lib/token';
-import { useNotification } from './notification/NotificationContext';
+import { useNotification } from '../notification/NotificationContext';
+import { flatCategoryLinks } from '@/data/mockData';
 
 
 const Menu = [
@@ -16,12 +17,8 @@ const Menu = [
   { name: 'Transaction History', link: '/transaction-history', icon: <RotateCcw size={24}/> },
   { name: 'Balance History', link: '/balance-history', icon: <FileText size={24}/> },
 ]
-interface HeaderProps {
-  scrolled: boolean;
-}
-export function Header({
-  scrolled,
-}: HeaderProps) {
+
+export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobileUserOpen, setIsMobileUserOpen] = useState(false);
   const handleMobileNav = (action: () => void) => {
@@ -52,7 +49,7 @@ export function Header({
     <>
       <header
         className={`fixed top-0 w-full h-14 z-50 transition-all duration-150 border-b border-border-subtle flex items-center px-4 md:px-6
-          ${scrolled ? 'bg-surface-secondary/80 backdrop-blur-md' : 'bg-surface-secondary'}
+          bg-surface-secondary/80 backdrop-blur-md' 
         `}>
 
         <div className="flex items-center justify-between w-full max-w-7xl mx-auto">

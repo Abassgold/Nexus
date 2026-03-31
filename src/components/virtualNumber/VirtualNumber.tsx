@@ -37,14 +37,19 @@ interface GetNumberResponse {
     msg?: string;
     data?: NumberInfo;
 }
+interface availablePrices {
+    cost: number;
+    stock: number;
+    price: number;
+    index: number;
+}
 
 interface PriceType {
     countryId: number;
-    cost: number;
-    stock: number;
     name: string;
     serviceID: string;
     country: string;
+    availablePrices: availablePrices[]
 }
 
 interface PriceResponse {
@@ -78,7 +83,7 @@ const VirtualNumber = ({ countries, services, savedNumberStr: initialNumberStr }
     });
 
     const router = useRouter();
-      const { notify } = useNotification();
+    const { notify } = useNotification();
     const pathname = usePathname();
     const prevPathname = useRef(pathname);
     const hasInitialized = useRef(false);
@@ -235,12 +240,20 @@ const VirtualNumber = ({ countries, services, savedNumberStr: initialNumberStr }
         poll();
     }, [cancelRental, clearInfo, updateOtp]);
 
-    const purchaseNumber = async (item: PriceType) => {
+    const purchaseNumber = async (item: availablePrices) => {
+        const payload = {
+            countryId: price?.countryId,
+            serviceID: price?.serviceID,
+            name: selectedService?.name,
+            country: selectedCountry?.eng || ''
+        }
         setLoading(true);
         try {
             const { data } = await axios.post<GetNumberResponse>(
                 `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/virtual-numbers/server1/sms`,
-                { ...item },
+
+
+                { ...item, ...payload },
                 { headers: { Authorization: `Bearer ${getToken()}` } }
             );
 
@@ -262,10 +275,10 @@ const VirtualNumber = ({ countries, services, savedNumberStr: initialNumberStr }
 
         } catch (error: unknown) {
             const err = error as AxiosError;
-            if (err.status === 401) return router.push('/login');
+            setLoading(false);
+            if (err.status === 401) return notify('You need to login first', 'error')
             if (err.status === 403) return router.push('/account-suspended');
             notify('Error occurred while trying to rent a number', 'error');
-            setLoading(false);
         }
     };
 
@@ -321,17 +334,16 @@ const VirtualNumber = ({ countries, services, savedNumberStr: initialNumberStr }
         try {
             const { data } = await axios.post<PriceResponse>(
                 `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/virtual-numbers/server1/price`,
-                { serviceID, countryCode: selectedCountry?.id }
+                { serviceID, countryCode: selectedCountry?.id, }
             );
-
-            if (data?.price) {
+            console.log(data)
+            if (data.price) {
                 setPrice({
                     countryId: data.price.countryId,
-                    cost: data.price.cost,
-                    stock: data.price.stock,
                     serviceID: data.price.serviceID,
                     name: serviceName,
                     country: selectedCountry?.eng || '',
+                    availablePrices: data.price.availablePrices
                 });
             } else {
                 setPrice(null);
@@ -448,23 +460,31 @@ const VirtualNumber = ({ countries, services, savedNumberStr: initialNumberStr }
                             {priceLoading ? (
                                 <p>Loading prices...</p>
                             ) : price !== null ? (
-                                <>
-                                    <button
-                                        disabled={loading}
-                                        onClick={() => purchaseNumber(price)}
-                                        className="flex w-full items-center justify-between text-[14px] cursor-pointer  gap-3 bg-accent text-surface-primary rounded-sm py-2 px-3 transition-colors"
-                                    >
-                                        <h2 className='text-[12px] font-semibold'>{selectedService.name}</h2>
-                                        <p className="text-[11px]">Stock: {price.stock ?? 0}</p>
-                                        <div className="flex gap-1 items-center">
-                                            <p>₦{price.cost.toLocaleString()}</p>
-                                            <ShoppingCart size={16} />
-                                        </div>
-                                    </button>
-                                    <div className="bg-yellow-100 my-3 text-yellow-800 p-3 rounded-md text-sm">
-                                        <strong>Note:</strong> Kindly click on the <strong>price above</strong> to receive your number and code. Turn your VPN <strong>on or off</strong> if needed to get your SMS. No code? You&apos;ll get a <strong>full refund</strong>. We aren&apos;t responsible for issues after you receive your code, such as account bans on WhatsApp, Telegram or other platforms.
+
+                                <div className="">
+                                    <div className="space-y-2 overflow-y-auto max-h-90">
+                                        {price.availablePrices.map((item, index) => (
+                                            <div key={index}>
+                                                <button
+                                                    disabled={loading}
+                                                    onClick={() => purchaseNumber({ ...item })}
+                                                    className="flex w-full items-center justify-between text-[14px] cursor-pointer gap-3 bg-accent text-surface-primary rounded-sm py-2 px-3 transition-colors"
+                                                >
+                                                    <h2 className='text-[12px] font-semibold'>{selectedService.name}</h2>
+                                                    <p className="text-[11px]">Stock: {item.stock ?? 0}</p>
+                                                    <div className="flex gap-1 items-center">
+                                                        <p>₦{item.cost}</p>
+                                                        <ShoppingCart size={16} />
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        ))}
                                     </div>
-                                </>
+
+                                    <div className="bg-yellow-100 my-3 text-yellow-800 p-3 rounded-md text-sm">
+                                         <strong>Note:</strong> Kindly click on any <strong>price above</strong> to receive your number and code. Turn your VPN <strong>on or off</strong> if needed to get your SMS. No code? You&apos;ll get a <strong>full refund</strong>. We aren&apos;t responsible for issues after you receive your code, such as account bans on WhatsApp, Telegram or other platforms. <strong>The higher the price, the higher the success rate.</strong>
+                                    </div>
+                                </div>
                             ) : (
                                 <p>No price available</p>
                             )}

@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getServices } from "@/fetchApi/Boosting";
 import axios from "axios";
 
 const faqs = [
@@ -51,17 +50,36 @@ const faqs = [
 ];
 
 
-
+ interface serviceResponse {
+    service: 4713,
+    name: '🟡 Facebook Post Likes | No Refill | Speed 500-1K/Day | Max 100K | NEW! |',
+    type: 'Default',
+    rate: '0.72',
+    min: 50,
+    max: 500000,
+    dripfeed: false,
+    refill: false,
+    cancel: false,
+    category: 'Cheapest Of All Time MoreThanPanel Services'
+  }
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [services, setServices] = useState<serviceResponse[]>([])
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 useEffect(()=>{
     const fetchServices = async () => {
-        const {data} = await axios.get('/api/boosting');
+      setLoading(true);
+      try{
+ const {data} = await axios.get('/api/boosting');
     console.log(data)
+      }catch(err){
+        console.log(err)
+      }finally{setLoading(false)}
+       
   };
 
   fetchServices();
@@ -74,13 +92,13 @@ useEffect(()=>{
         </h2>
 
         <div className="space-y-4">
-          {faqs.map((faq, index) => (
+          {services.map((faq, index) => (
             <div key={index} className=" cursor-pointer shadow-md overflow-hidden border rounded-sm bg-surface-secondary border-b border-border-subtle text-accent">
               <button
                 onClick={() => toggleFAQ(index)}
                 className="w-full flex justify-between items-center px-6 cursor-pointer py-4 text-left  font-medium text-sm sm:text-base  focus:outline-none"
               >
-                <span>{faq.question}</span>
+                <span>{faq.name}</span>
                 <span>{openIndex === index ? "-" : "+"}</span>
               </button>
 
@@ -93,7 +111,7 @@ useEffect(()=>{
                     transition={{ duration: 0.3 }}
                     className="px-6 pb-4  text-sm sm:text-base cursor-pointer"
                   >
-                    <div>{faq.answer}</div>
+                    <div>{faq.category}</div>
                   </motion.div>
                 )}
               </AnimatePresence>

@@ -1,68 +1,54 @@
 'use client';
-import { useEffect, useState } from "react";
-import { ArrowRight } from "lucide-react";
-import { Cat, getCategories } from "@/fetchApi/Social-Accounts";
-import Link from "next/link";
-import Image from 'next/image'
+import { AuthModal } from '@/components/AuthModal';
+import { CategoryNav } from '@/components/CategoryNav';
+import { ChatWidget } from '@/components/ChatWidget';
+import { ContactModal } from '@/components/ContactModal';
+import { Footer } from '@/components/Footer';
+import { Header } from '@/components/Header';
+import { SupplierModal } from '@/components/SupplierModal';
+import Home from '@/page/Home';
+import { useEffect, useState, useRef } from 'react';
 
+function Page() {
+  const [scrolled, setScrolled] = useState(false);
 
-const Home = () => {
-  const [categories, setCategories] = useState<Cat[]>([]);
-  const [loading, setLoading] = useState(false);
-
+  const [activeCategory, setActiveCategory] = useState('Accounts');
+  const sectionRefs = useRef<{
+    [key: string]: HTMLElement | null;
+  }>({});
   useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  // Notification Helper
 
-    const fetchCategories = async () => {
-      setLoading(true);
-      try {
-        const result = await getCategories();
-        setCategories(result ?? []);
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-      } finally { setLoading(false) }
-    };
-
-    fetchCategories();
-  }, [])
-
+  // Category Scroll Handler
+  const handleCategorySelect = (category: string) => {
+    setActiveCategory(category);
+    const element = sectionRefs.current[category];
+    if (element) {
+      const y = element.getBoundingClientRect().top + window.scrollY - 120; // offset for fixed header + nav
+      window.scrollTo({
+        top: y,
+        behavior: 'smooth'
+      });
+    }
+  };
   return (
-    <section id="faq" className=" ">
-      <div className="max-w-280 mx-auto px-4">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-[#8a8a8a]  ">
-          Buy Social Accounts
-        </h2>
-        {loading ? (
-          <p className="text-center text-accent text-lg"> Loading...</p>
-        ) : (
-          <div className="space-y-4">
-            {categories.map((cat, index) => (
-              <div key={index} className="cursor-pointer shadow-md overflow-hidden border rounded-sm bg-surface-secondary border-b border-border-subtle text-accent">
-                <Link
-                  key={cat.id}
-                  href={`/accounts`}
-                  className="w-full flex justify-between items-center px-6 cursor-pointer py-3 text-left  font-medium text-sm md:text-base  focus:outline-none"
-                >
-                  <div className="flex gap-2 items-center">
-                    <Image
-                    className="rounded-md"
-                      src={cat.image}
-                      width={25}
-                      height={25}
-                      alt={cat.slug}
-                    />
-                    <span>{cat.title}</span>
-
-                  </div>
-                  <span><ArrowRight size={15}/></span>
-                </Link>
-              </div>
-            ))}
-          </div>
-        )}
-
-      </div>
-    </section>
+    <div className="min-h-screen bg-surface-primary text-txt-primary font-body flex flex-col">
+      <Header
+        scrolled={scrolled}
+      />
+      <CategoryNav
+        activeCategory={activeCategory}
+        onCategorySelect={handleCategorySelect}
+      />
+      <Home />
+      <Footer />
+      <ChatWidget />
+    </div>
   );
-};
 
-export default Home;
+}
+export default Page;
