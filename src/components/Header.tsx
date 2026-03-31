@@ -122,81 +122,24 @@ export function Header({
       {mobileMenuOpen && (
         <div className="fixed inset-0 top-14 z-40 bg-surface-primary border-t border-border-subtle animate-fade-in md:hidden flex flex-col overflow-y-auto pb-8">
 
-          {user && user.userName ? (
-            <div className="border-b border-border-subtle bg-surface-secondary">
-
-              {/* Trigger */}
-              <button
-                onClick={() => setIsMobileUserOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between p-4 hover:bg-surface-tertiary transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent font-bold text-lg uppercase">
-                    {user.userName.charAt(0)}
-                  </div>
-                  <div className="text-left">
-                    <div className="text-sm font-subheading text-txt-primary capitalize">
-                      {user.userName}
-                    </div>
-                    <div className="text-xs text-txt-secondary">{user.email}</div>
-                  </div>
-                </div>
-                <ChevronDownIcon
-                  size={16}
-                  className={`text-txt-muted transition-transform duration-200 ${isMobileUserOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {/* Dropdown */}
-              {isMobileUserOpen && (
-                <div className="mx-4 mb-3 border border-border-subtle rounded-sm overflow-hidden">
-                  {Menu.map((link, index) => (
-                    <Link
-                      key={index}
-                      href={link.link}
-                    >
-                      <button
-                        onClick={() => handleMobileNav(() => { })}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-sm text-txt-primary hover:bg-surface-elevated transition-colors"
-                      >
-                        {link.icon}
-                        {link.name}
-                      </button>
-                      <div className="border-t border-border-subtle" />
-                    </Link>
-                  ))}
-                  <button
-                    onClick={() => handleMobileNav(logOut)}
-                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-500 hover:bg-surface-elevated transition-colors"
-                  >
-                    <LogOutIcon size={15} />
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
+         
             <div className="p-4 border-b border-border-subtle grid grid-cols-2 gap-3">
               <Link
-              href='signin'
-                className="w-full text-sm font-semibold text-txt-primary bg-surface-tertiary border border-border-subtle px-4 py-2.5 rounded-sm"
+              href='/signin'
+                className="w-full text-center text-sm font-semibold text-txt-primary bg-surface-tertiary border border-border-subtle px-4 py-2.5 rounded-sm"
               >
                 Login
               </Link>
               <Link
-              href='signup'
-                className="w-full text-sm font-semibold text-accent border border-accent/30 px-4 py-2.5 rounded-sm"
+              href='/signup'
+                className="w-full text-center text-sm font-semibold text-accent border border-accent/30 px-4 py-2.5 rounded-sm"
               >
                 Sign Up
               </Link>
             </div>
-          )}
 
           {/* Categories */}
           <div className="p-4">
-            <h3 className="text-xs font-heading font-semibold text-txt-muted uppercase tracking-wider mb-3">
-              Categories
-            </h3>
             <div className="flex flex-col gap-1">
               {flatCategoryLinks.map((link) => (
                 <Link
@@ -212,7 +155,7 @@ export function Header({
           </div>
 
           {/* Utilities */}
-          <div className="p-4 mt-auto">
+          <div className="p-2 mt-auto flex items-center">
             <Link
             href='/contact-support'
               className="w-full text-left text-sm font-subheading text-txt-secondary hover:text-txt-primary py-3 border-b border-border-subtle"
@@ -221,7 +164,7 @@ export function Header({
             </Link>
             <Link
             href='/become-supplier'
-              className="w-full mt-4 text-sm font-semibold bg-accent text-surface-primary px-4 py-3 rounded-sm"
+              className="w-full  text-sm font-semibold bg-accent text-surface-primary px-4 py-3 rounded-sm"
             >
               Become a Supplier
             </Link>

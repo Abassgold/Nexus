@@ -79,9 +79,6 @@ export function Header() {
 
               Contact
             </Link>
-
-             
-
               <>
                 <Link
                 href='/signin'
