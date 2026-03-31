@@ -79,7 +79,7 @@ const Signin = () => {
     };
     return (
         <section className="h-screen flex items-center justify-center">
-            <div className="w-full p-4">
+            <div className="w-full">
                 <div className="flex items-center justify-center p-4">
                     <div className="relative w-full max-w-md bg-surface-secondary border border-border-subtle rounded-sm shadow-2xl animate-fade-in flex flex-col">
                         <div className="flex items-center justify-between border-b border-border-subtle px-6 pt-6 pb-0">
