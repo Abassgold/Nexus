@@ -40,6 +40,32 @@ export interface Listing {
   data: Product[];
 }
 
+export interface ListingDetail {
+  id: number;
+  title: string;
+  slug: string;
+  price: string;
+  available_stock: number;
+  sold: number;
+  category: {
+    id: number;
+    title: string;
+    slug: string;
+  };
+  subcategory: {
+    id: number;
+    title: string;
+    slug: string;
+  };
+  description: string;
+  supplier: {
+    name: string;
+  };
+}
+export interface ListingBySlug {
+  success: boolean;
+  data: ListingDetail;
+}
 
 
 export interface PurchasePayload {
@@ -87,8 +113,8 @@ export const getListings = async (category_id: number, subcategory_id: number): 
   return data.data;
 };
 
-export const getListingBySlug = async (slug: string): Promise<Listing> => {
-  const { data } = await axios.get<Listing>(`${API_URL}/listings/${slug}`, {
+export const getListingBySlug = async (slug: string): Promise<ListingBySlug> => {
+  const { data } = await axios.get<ListingBySlug>(`${API_URL}/listings/${slug}`, {
     headers,
   });
   return data;

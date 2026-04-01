@@ -117,7 +117,6 @@ export default function Dashboard({
   user = mockUser,
   balance = mockBalance,
   transactions = mockTransactions,
-  onFundWallet = () => alert('Fund wallet clicked'),
 }: DashboardProps) {
   const totalSpent = transactions
     .filter((t) => t.type === 'purchase' && t.status === 'completed')
@@ -214,12 +213,12 @@ export default function Dashboard({
           <div className="font-heading font-bold text-3xl text-txt-primary mb-4 relative z-10">
             ${balance.toFixed(2)}
           </div>
-          <button
-            onClick={onFundWallet}
+          <Link
+          href='/fund-wallet'
             className="w-full bg-accent text-surface-primary font-bold text-xs py-2.5 rounded-sm hover:bg-accent-hover transition-colors flex items-center justify-center gap-2 relative z-10"
           >
             <PlusIcon size={14} /> Fund Wallet
-          </button>
+          </Link>
         </div>
 
         {/* Total Spent */}

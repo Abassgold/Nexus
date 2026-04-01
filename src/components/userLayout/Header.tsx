@@ -47,8 +47,9 @@ export function Header() {
   const user = useAppSelector((state) => state.auth);
   return (
     <>
+    
       <header
-        className={`fixed top-0 w-full h-14 z-50 transition-all duration-150 border-b border-border-subtle flex items-center px-4 md:px-6
+        className={`h-14 border-b border-border-subtle flex items-center px-4 md:px-6
           bg-surface-secondary/80 backdrop-blur-md' 
         `}>
 

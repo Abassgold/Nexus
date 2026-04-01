@@ -36,7 +36,7 @@ export const ProductSection = forwardRef<HTMLElement, ProductSectionProps>(
           </div>
 
           <div className="flex flex-col">
-            {products.map((product, idx) => ( // ← .map() added
+            {products.map((product, idx) => (
               <ProductRow
                 key={product.id}
                 product={product}

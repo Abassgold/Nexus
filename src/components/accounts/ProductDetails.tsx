@@ -1,5 +1,6 @@
+import { ListingDetail } from "@/fetchApi/Social-Accounts";
 
-const ProductDetails = () => {
+const ProductDetails = ({ details }: { details: ListingDetail }) => {
     return (
         <div className="relative w-full  bg-surface-secondary border border-border-subtle rounded-sm shadow-2xl animate-fade-in flex flex-col">
             {/* Header & Tabs */}
@@ -7,8 +8,7 @@ const ProductDetails = () => {
                 <div
 
                     className={`pb-3 p-2 font-heading font-semibold text-sm transition-colors border-b-2 text-accent border-accent`}>
-
-                    Facebook Accounts | USA | USA SMS & Email Verified | Email Included | Profile & Cover Photo | Registered from USA IP
+                    {details.title}
                 </div>
             </div>
 
@@ -22,7 +22,7 @@ const ProductDetails = () => {
                                 type="text"
                                 disabled
                                 className="w-full bg-teal-900 border-border-subtle text-white text-md font-semibold rounded-sm py-4 pl-10 pr-4 outline-none"
-                                placeholder="Price for 1 Piece: 0.99" />
+                                placeholder={`Price for 1 Piece: ${details.price}`} />
 
                         </div>
                     </div>
@@ -31,14 +31,12 @@ const ProductDetails = () => {
 
                         <div className="w-full bg-surface-tertiary border border-border-subtle text-txt-primary text-sm rounded-sm py-2.5 pl-10 pr-4 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all placeholder:text-txt-muted">
                             <div className=' flex'>
-                                <p>Stock</p> <p>50</p>
+                                <p>Stock</p> <p>${details.available_stock}</p>
                             </div>
                             <div className=' flex'>
                                 <p>Quantity</p>
                                 <input type="text" />
                             </div>
-
-
                         </div>
                     </div>
 
@@ -81,7 +79,7 @@ const ProductDetails = () => {
 
                             </div>
                         </div>
-                       
+
                     </>
 
                     <button
