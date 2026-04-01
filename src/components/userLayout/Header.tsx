@@ -55,7 +55,7 @@ export function Header() {
         <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
           {/* Logo */}
           <div
-            className="flex items-baseline gap-2 cursor-pointer"
+            className="md:hidden flex items-baseline gap-2 cursor-pointer"
             onClick={() =>
               window.scrollTo({
                 top: 0,

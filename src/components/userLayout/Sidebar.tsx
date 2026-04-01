@@ -20,14 +20,14 @@ const Sidebar = () => {
   return (
     <aside className="h-screen fixed top-0 w-64 bg-surface-secondary border-r border-border-subtle flex flex-col">
       {/* Logo Section */}
-      <div className="p-6 border-b border-border-subtle">
+      <div className="h-14 px-4 md:px-6 py-3 border-b border-border-subtle ">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-accent rounded-sm flex items-center justify-center text-surface-primary font-bold">
-            A
-          </div>
-          <span className="font-heading font-bold text-txt-primary tracking-tight">
-            APP NAME
-          </span>
+         <h1 className="font-heading font-bold text-xl text-txt-primary tracking-tight">
+              NE<span className="text-accent">X</span>US
+            </h1>
+            <span className="text-txt-muted text-[10px] tracking-[0.2em] font-medium uppercase hidden sm:inline-block">
+              Market
+            </span>
         </div>
       </div>
 
