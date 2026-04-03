@@ -5,8 +5,5 @@ export interface IUser {
 export interface findUser {
   email: string;
   userName: string;
-  _id: string;
   role?: string;
-  token?: string;
-  msg?: string;
 }

@@ -5,14 +5,15 @@ async function Accounts() {
     const res = await getSubCategories(22);
 
     const listingsPerSubcategory = await Promise.all(
-        res.map(item => getListings(22,  item.id ))
+        res.data.subcategories.map(item => getListings(22,  item.id ))
     );
 
     return (
         <div className='mt-8'>
-            {res.map((item, index) => (
+            {res.data.subcategories.map((item, index) => (
                 <ProductSection
                     key={item.id}
+                    category={res.data.category.title}
                     title={item.title}
                     products={listingsPerSubcategory[index]}
                     accentLabel="HOT"

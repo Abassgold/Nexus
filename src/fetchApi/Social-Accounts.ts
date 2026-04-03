@@ -89,14 +89,14 @@ export const getCategories = async (): Promise<Cat[]> => {
   return data.data;
 };
 
-export const getSubCategories = async (id: number): Promise<SubCat[]> => {
+export const getSubCategories = async (id: number): Promise<SubCategory> => {
   const { data } = await axios.get<SubCategory>(
     `${API_URL}/categories/${id}/subcategories`,
     { headers }
   );
   console.log('the sub-categories: ', data)
 
-  return data.data.subcategories;
+  return data;
 };
 
 export const getListings = async (category_id: number, subcategory_id: number): Promise<Product[]> => {

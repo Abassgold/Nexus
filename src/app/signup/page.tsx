@@ -3,29 +3,20 @@
 import { useNotification } from "@/components/notification/NotificationContext";
 import { trackTikTokEvent } from "@/lib/tiktok";
 import { setToken } from "@/lib/token";
-import { useAppDispatch } from "@/redux/hooks";
-import { addUser } from "@/redux/slice/auth";
 import axios from "axios";
 import { EyeIcon, EyeOffIcon, LoaderIcon, LockIcon, MailIcon, UserIcon, XIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-
-export interface findUser {
-    email: string;
-    userName: string;
-    _id: string;
-    role?: string;
-};
 
 export interface AuthResponse {
     ok: boolean;
-    user?: findUser;
     token?: string;
     msg?: string;
 }
 
 const Page = () => {
-    const dispatch = useAppDispatch()
+    const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
@@ -57,40 +48,34 @@ const Page = () => {
         if (password.length < 6)
             return setError('Password must be at least 6 characters');
 
+        if (password.length > 12)
+            return setError('Password must not exceed 12 characters');
+
         if (!terms)
             return setError('You must agree to the terms');
 
         setIsLoading(true);
 
         try {
-            let data;
 
             // Replace with your actual signup API call
-            data = await axios.post<AuthResponse>('/api/signup', {
+            const { data } = await axios.post<AuthResponse>('/api/signup', {
                 userName,
                 email,
                 password,
                 confirmPassword
             });
             trackTikTokEvent('CompleteRegistration');
-
-            // email: string;
-            // userName: string;
-            // _id: string;
-            // role ?: string;
-            // Only runs if the request succeeded
-            console.log('the data result ;', data.data)
-            if (!data.data.ok)
-                return;
+            console.log('the data result ;', data)
+            if (!data.ok)
+                return setError(data.msg ?? 'Unable to sign up');
             clearInput();
-            dispatch(addUser(data.data.user!));
-            setToken(data.data.token ?? '');
+            setToken(data.token ?? '');
             notify('Registration successful!', 'success')
-
-
+            router.push('/user/dashboard')
         } catch (err: any) {
             // Show a meaningful error to the user
-            setError(err?.response?.data?.message ?? 'Something went wrong. Please try again.');
+            setError('Something went wrong. Please try again.');
         } finally {
             setIsLoading(false); // always stop the loader
         }

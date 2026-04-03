@@ -6,18 +6,19 @@ import { ChevronRightIcon } from 'lucide-react';
 
 interface ProductSectionProps {
   title: string;
+  category: string;
   products: Product[]; // ← not a Promise
   accentLabel?: string;
 }
 
 export const ProductSection = forwardRef<HTMLElement, ProductSectionProps>(
-  ({ title, products, accentLabel }, ref) => {
+  ({ title, category, products, accentLabel }, ref) => {
     return (
       <section ref={ref} className="mb-8 scroll-mt-32">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <h2 className="font-heading font-semibold md:font-bold  md:text-lg text-txt-primary tracking-tight">
-              {title}
+             {category} - {title}
             </h2>
             {accentLabel && (
               <span className="bg-accent/10 text-accent border border-accent/20 text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider">

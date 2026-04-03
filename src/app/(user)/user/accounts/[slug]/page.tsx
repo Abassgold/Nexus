@@ -15,7 +15,6 @@ const Page = async ({
     if(!res.success) return <div>product not found</div>
     return (
         <>
-            id{slug}
             <ProductDetails details={res.data}/>
         </>
     );

@@ -2,77 +2,60 @@
 
 import { useNotification } from "@/components/notification/NotificationContext";
 import { setToken } from "@/lib/token";
-import { useAppDispatch } from "@/redux/hooks";
-import { addUser } from "@/redux/slice/auth";
 import axios from "axios";
-import { EyeIcon, EyeOffIcon, LoaderIcon, LockIcon, MailIcon, XIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, LoaderIcon, LockIcon, MailIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-
-export interface findUser {
-    email: string;
-    userName: string;
-    _id: string;
-    role?: string;
-};
 
 export interface AuthResponse {
     ok: boolean;
-    user?: findUser;
     token?: string;
     msg?: string;
 }
 const Signin = () => {
-    const dispatch = useAppDispatch()
+    const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    // Form states
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [userName, setUserName] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [terms, setTerms] = useState(false);
     const { notify } = useNotification();
 
     const clearInput = () => {
         setEmail('');
         setPassword('');
-        setUserName('');
-        setConfirmPassword('');
-        setTerms(false)
     }
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+
         e.preventDefault();
         setError('');
 
         if (!email || !password)
-            return setError('Email and password are required');
+            return setError('Email or password is required');
+
 
         setIsLoading(true);
 
         try {
-
-
-            // Replace with your actual login API call
-            const { data } = await axios.post<AuthResponse>(`/api/signin`, {
+            const { data } = await axios.post<AuthResponse>('/api/signin', {
                 email,
-                password
+                password,
             });
-            // email: string;
-            // userName: string;
-            // _id: string;
-            // role ?: string;
-            // Only runs if the request succeeded
-            console.log('the data result ;', data)
+
             if (!data.ok)
-                return;
+                return setError(data.msg ?? 'Login failed. Please try again.');
+
             clearInput();
-            dispatch(addUser(data.user!));
             setToken(data.token ?? '');
-            notify('Login successful!', 'success')
-        } catch (err: any) {
-            setError(err?.response?.data?.message ?? 'Something went wrong. Please try again.');
+            notify('Login Successful!', 'success');
+            router.push('/user/dashboard');
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data?.message ?? 'Login failed. Please try again.');
+            } else {
+                setError('An unexpected error occurred.');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -118,7 +101,6 @@ const Signin = () => {
                                             placeholder="you@example.com" />
                                     </div>
                                 </div>
-
                                 <div>
                                     <div className="flex items-center justify-between mb-1.5">
                                         <label className="block text-xs font-semibold text-txt-secondary uppercase tracking-wider">

@@ -3,19 +3,22 @@ import { useEffect, useRef, useState } from 'react';
 import { MenuIcon, XIcon, Palette, ShoppingCart, CreditCard, RotateCcw, FileText, LogOutIcon, UserIcon, ChevronDownIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { clearUser } from '@/redux/slice/auth';
-import { deleteToken } from '@/lib/token';
+import { addUser, clearUser } from '@/redux/slice/auth';
+import { deleteToken, getToken } from '@/lib/token';
 import { useNotification } from '../notification/NotificationContext';
 import { flatCategoryLinks } from '@/data/mockData';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import { findUser } from '@/redux/type';
 
 
 const Menu = [
-  { name: 'Profile', link: '/', icon: <UserIcon size={24}/> },
-  { name: 'Dashboard', link: '/dashboard', icon: <Palette size={24}/> },
-  { name: 'My Orders', link: '/orders', icon: <ShoppingCart size={24}/> },
-  { name: 'Add Funds', link: '/add-funds', icon: <CreditCard size={24}/> },
-  { name: 'Transaction History', link: '/transaction-history', icon: <RotateCcw size={24}/> },
-  { name: 'Balance History', link: '/balance-history', icon: <FileText size={24}/> },
+  { name: 'Profile', link: '/', icon: <UserIcon size={14} /> },
+  { name: 'Dashboard', link: '/dashboard', icon: <Palette size={14} /> },
+  { name: 'My Orders', link: '/orders', icon: <ShoppingCart size={14} /> },
+  { name: 'Add Funds', link: '/add-funds', icon: <CreditCard size={14} /> },
+  { name: 'Transaction History', link: '/transaction-history', icon: <RotateCcw size={14} /> },
+  { name: 'Balance History', link: '/balance-history', icon: <FileText size={14} /> },
 ]
 
 export function Header() {
@@ -34,7 +37,7 @@ export function Header() {
   }
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const router = useRouter();
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -44,10 +47,31 @@ export function Header() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
   const user = useAppSelector((state) => state.auth);
+  useEffect(() => {
+    if (user?.email !== '') return;
+    const fetchUser = async () => {
+      try {
+        const { data } = await axios.get<findUser>(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/me`,
+          {
+            headers: {
+              Authorization: `Bearer ${getToken()}`
+            }
+          }
+        )
+        console.log('the data is :', data)
+          dispatch(addUser(data))
+      } catch (err) {
+        console.error('Failed to fetch user info:', err)
+      }
+    }
+    fetchUser()
+  }, [])
   return (
     <>
-    
+
       <header
         className={`h-14 border-b border-border-subtle flex items-center px-4 md:px-6
           bg-surface-secondary/80 backdrop-blur-md' 
@@ -72,36 +96,7 @@ export function Header() {
             </span>
           </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6">
-            <Link
-            href='contact-us'
-              className="text-sm font-subheading text-txt-secondary hover:text-txt-primary transition-colors">
-
-              Contact
-            </Link>
-              <>
-                <Link
-                href='/signin'
-                  className="text-sm font-subheading text-txt-secondary hover:text-txt-primary transition-colors">
-
-                  Login
-                </Link>
-                <div className="h-4 w-px bg-border-subtle mx-2"></div>
-                <Link
-                href='/signup'
-                  className="text-xs font-semibold text-accent border border-accent/30 hover:border-accent hover:bg-accent/10 px-4 py-1.5 rounded-sm transition-all duration-150">
-
-                  Sign Up
-                </Link>
-                <Link
-                href='/become-supplier'
-                  className="text-xs font-semibold bg-accent text-surface-primary hover:bg-accent-hover px-4 py-1.5 rounded-sm transition-all duration-150">
-
-                  Become a Supplier
-                </Link>
-              </>
-          </nav>
+         
 
           {/* Mobile Actions */}
           <div className="flex md:hidden items-center gap-4">
@@ -117,7 +112,7 @@ export function Header() {
       {mobileMenuOpen && (
         <div className="fixed inset-0 top-14 z-40 bg-surface-primary border-t border-border-subtle animate-fade-in md:hidden flex flex-col overflow-y-auto pb-8">
 
-          {user && user.userName ? (
+          {user && user.email ?  (
             <div className="border-b border-border-subtle bg-surface-secondary">
 
               {/* Trigger */}
@@ -125,7 +120,7 @@ export function Header() {
                 onClick={() => setIsMobileUserOpen((prev) => !prev)}
                 className="w-full flex items-center justify-between p-4 hover:bg-surface-tertiary transition-colors"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 z-100">
                   <div className="w-10 h-10 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent font-bold text-lg uppercase">
                     {user.userName.charAt(0)}
                   </div>
@@ -133,7 +128,9 @@ export function Header() {
                     <div className="text-sm font-subheading text-txt-primary capitalize">
                       {user.userName}
                     </div>
-                    <div className="text-xs text-txt-secondary">{user.email}</div>
+                    <div className="text-xs text-txt-secondary">
+                      {user.email}
+                      </div>
                   </div>
                 </div>
                 <ChevronDownIcon
@@ -152,7 +149,7 @@ export function Header() {
                     >
                       <button
                         onClick={() => handleMobileNav(() => { })}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-sm text-txt-primary hover:bg-surface-elevated transition-colors"
+                        className="w-full  flex items-center gap-2 px-4 py-3 text-sm text-txt-secondary hover:bg-surface-elevated transition-colors"
                       >
                         {link.icon}
                         {link.name}
@@ -173,13 +170,13 @@ export function Header() {
           ) : (
             <div className="p-4 border-b border-border-subtle grid grid-cols-2 gap-3">
               <Link
-              href='signin'
+                href='signin'
                 className="w-full text-sm font-semibold text-txt-primary bg-surface-tertiary border border-border-subtle px-4 py-2.5 rounded-sm"
               >
                 Login
               </Link>
               <Link
-              href='signup'
+                href='signup'
                 className="w-full text-sm font-semibold text-accent border border-accent/30 px-4 py-2.5 rounded-sm"
               >
                 Sign Up
@@ -204,22 +201,6 @@ export function Header() {
                 </Link>
               ))}
             </div>
-          </div>
-
-          {/* Utilities */}
-          <div className="p-4 mt-auto">
-            <Link
-            href='/contact-support'
-              className="w-full text-left text-sm font-subheading text-txt-secondary hover:text-txt-primary py-3 border-b border-border-subtle"
-            >
-              Contact Support
-            </Link>
-            <Link
-            href='/become-supplier'
-              className="w-full mt-4 text-sm font-semibold bg-accent text-surface-primary px-4 py-3 rounded-sm"
-            >
-              Become a Supplier
-            </Link>
           </div>
         </div>
       )}

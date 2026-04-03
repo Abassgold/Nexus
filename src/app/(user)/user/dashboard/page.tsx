@@ -2,9 +2,6 @@
 import {
   WalletIcon,
   PlusIcon,
-  ArrowRightIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
   KeyIcon,
   MonitorIcon,
   SmartphoneIcon,
@@ -19,6 +16,7 @@ import {
   ShoppingBagIcon,
   EyeIcon,
   ActivityIcon,
+  ChevronRightIcon,
 } from 'lucide-react'
 import Link from 'next/link';
 interface Transaction {
@@ -44,7 +42,7 @@ const mockUser = {
   username: 'alexriver',
   email: 'alex.river@example.com',
 }
- 
+
 const mockTransactions: Transaction[] = [
   {
     id: 'txn_001',
@@ -111,8 +109,8 @@ const mockTransactions: Transaction[] = [
     status: 'failed',
   },
 ]
- 
-const mockBalance = 22.04   
+
+const mockBalance = 22.04
 export default function Dashboard({
   user = mockUser,
   balance = mockBalance,
@@ -182,7 +180,7 @@ export default function Dashboard({
   const greeting =
     hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 md:px-6 pt-10 md:pt-12 pb-16 animate-fade-in">
+    <div className="animate-fade-in">
       {/* Welcome Header */}
       <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
         <div>
@@ -196,68 +194,68 @@ export default function Dashboard({
           </h1>
           <p className="text-sm text-txt-secondary mt-1">{user.email}</p>
         </div>
-        
+
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {/* Balance Card — Primary */}
-        <div className="sm:col-span-2 lg:col-span-1 bg-linear-to-br from-surface-tertiary to-surface-elevated border border-border-subtle rounded-sm p-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full blur-2xl pointer-events-none"></div>
-          <div className="flex items-center justify-between mb-4 relative z-10">
-            <div className="flex items-center gap-2 text-txt-secondary text-xs font-semibold uppercase tracking-wider">
-              <WalletIcon size={14} className="text-accent" /> Wallet Balance
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Primary Balance Card - Takes up 2 columns on large screens */}
+        <div className="lg:col-span-2 bg-linear-to-br from-surface-tertiary to-surface-elevated border border-border-subtle rounded-sm p-8 relative overflow-hidden flex flex-col justify-between min-h-[200px]">
+          {/* Decorative background glow */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div>
+            <div className="flex items-center justify-between mb-6 relative z-10">
+              <div className="flex items-center gap-2 text-txt-secondary text-xs font-semibold uppercase tracking-widest">
+                <WalletIcon size={16} className="text-accent" /> Available Balance
+              </div>
+              <button className="p-1 hover:bg-surface-elevated rounded-full transition-colors">
+                <EyeIcon size={16} className="text-txt-muted" />
+              </button>
             </div>
-            <EyeIcon size={14} className="text-txt-muted" />
+
+            <div className="font-heading font-bold text-5xl text-txt-primary mb-2 relative z-10">
+              ${balance.toFixed(2)}
+            </div>
+            <p className="text-txt-muted text-sm relative z-10">Ready for your next order</p>
           </div>
-          <div className="font-heading font-bold text-3xl text-txt-primary mb-4 relative z-10">
-            ${balance.toFixed(2)}
+
+          <div className="mt-8 relative z-10">
+            <Link
+              href='/fund-wallet'
+              className="inline-flex items-center justify-center gap-2 bg-accent text-surface-primary font-bold text-sm px-8 py-3 rounded-sm hover:bg-accent-hover transition-all transform hover:scale-[1.01] active:scale-[0.99]"
+            >
+              <PlusIcon size={18} /> Fund Wallet
+            </Link>
           </div>
+        </div>
+
+        {/* Quick Actions / Navigation Card */}
+        <div className="bg-surface-secondary border border-border-subtle rounded-sm p-8 flex flex-col justify-center">
+          <div className="mb-6">
+            <h3 className="text-txt-primary font-bold text-lg mb-1">Manage Funds</h3>
+            <p className="text-txt-muted text-sm">View your history and manage payments</p>
+          </div>
+
           <Link
-          href='/fund-wallet'
-            className="w-full bg-accent text-surface-primary font-bold text-xs py-2.5 rounded-sm hover:bg-accent-hover transition-colors flex items-center justify-center gap-2 relative z-10"
+            href="/transactions"
+            className="group flex items-center justify-between p-4 bg-surface-tertiary border border-border-subtle rounded-sm hover:border-accent/50 transition-colors"
           >
-            <PlusIcon size={14} /> Fund Wallet
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-accent/10 rounded-sm">
+                <ActivityIcon size={20} className="text-accent" />
+              </div>
+              <span className="font-semibold text-txt-primary">Transaction History</span>
+            </div>
+            <ChevronRightIcon size={18} className="text-txt-muted group-hover:text-accent transition-transform group-hover:translate-x-1" />
           </Link>
-        </div>
-
-        {/* Total Spent */}
-        <div className="bg-surface-secondary border border-border-subtle rounded-sm p-6">
-          <div className="flex items-center gap-2 text-txt-secondary text-xs font-semibold uppercase tracking-wider mb-3">
-            <TrendingDownIcon size={14} className="text-red-400" /> Total Spent
-          </div>
-          <div className="font-heading font-bold text-2xl text-txt-primary mb-1">
-            ${totalSpent.toFixed(2)}
-          </div>
-          <p className="text-xs text-txt-muted">{orderCount} orders placed</p>
-        </div>
-
-        {/* Total Deposited */}
-        <div className="bg-surface-secondary border border-border-subtle rounded-sm p-6">
-          <div className="flex items-center gap-2 text-txt-secondary text-xs font-semibold uppercase tracking-wider mb-3">
-            <TrendingUpIcon size={14} className="text-stock-green" /> Deposited
-          </div>
-          <div className="font-heading font-bold text-2xl text-txt-primary mb-1">
-            ${totalDeposited.toFixed(2)}
-          </div>
-          <p className="text-xs text-txt-muted">Lifetime deposits</p>
-        </div>
-
-        {/* Activity */}
-        <div className="bg-surface-secondary border border-border-subtle rounded-sm p-6">
-          <div className="flex items-center gap-2 text-txt-secondary text-xs font-semibold uppercase tracking-wider mb-3">
-            <ActivityIcon size={14} className="text-accent" /> Activity
-          </div>
-          <div className="font-heading font-bold text-2xl text-txt-primary mb-1">
-            {transactions.length}
-          </div>
-          <p className="text-xs text-txt-muted">Total transactions</p>
         </div>
       </div>
 
       {/* Two Column Layout */}
       <div className="">
-                {/* Quick Services — 1 col */}
+        {/* Quick Services — 1 col */}
         <div className="bg-surface-secondary mb-8 border border-border-subtle rounded-sm overflow-hidden">
           <div className="p-5 border-b border-border-subtle">
             <h2 className="font-heading font-semibold text-base text-txt-primary">
@@ -266,24 +264,24 @@ export default function Dashboard({
           </div>
           <div className='p-2'>
             <div className="  grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 justify-around items-center gap-2">
-            {quickServices.map((svc, idx) => (
-              <Link
-              href={svc.link}
-                key={idx}
-                className="w-full flex flex-col items-center border border-border-subtle rounded-sm gap-3 p-4 hover:bg-surface-tertiary transition-colors text-left"
-              >
-                <div className="w-9 h-9 shrink-0 bg-surface-primary border border-border-subtle rounded-sm flex items-center justify-center">
-                  {svc.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="font-subheading font-medium text-sm text-txt-primary">
-                    {svc.label}
+              {quickServices.map((svc, idx) => (
+                <Link
+                  href={svc.link}
+                  key={idx}
+                  className="w-full flex flex-col items-center border border-border-subtle rounded-sm gap-3 p-4 hover:bg-surface-tertiary transition-colors text-left"
+                >
+                  <div className="w-9 h-9 shrink-0 bg-surface-primary border border-border-subtle rounded-sm flex items-center justify-center">
+                    {svc.icon}
                   </div>
-                 
-                </div>
-              </Link>
-            ))}
-          </div>
+                  <div className="flex-1">
+                    <div className="font-subheading font-medium text-sm text-txt-primary">
+                      {svc.label}
+                    </div>
+
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
         {/* Transactions — 2 cols */}
@@ -310,7 +308,7 @@ export default function Dashboard({
                 Start by funding your wallet and browsing the marketplace.
               </p>
               <button
-                 className="text-xs font-semibold text-accent hover:text-accent-hover transition-colors"
+                className="text-xs font-semibold text-accent hover:text-accent-hover transition-colors"
               >
                 Browse Products →
               </button>
