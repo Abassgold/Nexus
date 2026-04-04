@@ -10,6 +10,7 @@ import { flatCategoryLinks } from '@/data/mockData';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { findUser } from '@/redux/type';
+import ProfileDropdown from './ProfileDropdown';
 
 
 const Menu = [
@@ -62,7 +63,7 @@ export function Header() {
           }
         )
         console.log('the data is :', data)
-          dispatch(addUser(data))
+        dispatch(addUser(data))
       } catch (err) {
         console.error('Failed to fetch user info:', err)
       }
@@ -73,32 +74,10 @@ export function Header() {
     <>
 
       <header
-        className={`h-14 border-b border-border-subtle flex items-center px-4 md:px-6
+        className={`h-14 border-b border-border-subtle flex justify-between items-center px-4 md:px-6
           bg-surface-secondary/80 backdrop-blur-md' 
         `}>
-
-        <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
-          {/* Logo */}
-          <div
-            className="md:hidden flex items-baseline gap-2 cursor-pointer"
-            onClick={() =>
-              window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-              })
-            }>
-
-            <h1 className="font-heading font-bold text-xl text-txt-primary tracking-tight">
-              NE<span className="text-accent">X</span>US
-            </h1>
-            <span className="text-txt-muted text-[10px] tracking-[0.2em] font-medium uppercase hidden sm:inline-block">
-              Market
-            </span>
-          </div>
-
-         
-
-          {/* Mobile Actions */}
+        <div className='flex items-center gap-2'>
           <div className="flex md:hidden items-center gap-4">
             <button
               className="text-txt-secondary hover:text-txt-primary"
@@ -106,84 +85,30 @@ export function Header() {
               {mobileMenuOpen ? <XIcon size={20} /> : <MenuIcon size={20} />}
             </button>
           </div>
-        </div>
-      </header>
+          <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
+            {/* Logo */}
+            <div
+              className="md:hidden flex items-baseline gap-2 cursor-pointer"
+              onClick={() =>
+                window.scrollTo({
+                  top: 0,
+                  behavior: 'smooth'
+                })
+              }>
 
+              <h1 className="font-heading font-bold text-xl text-txt-primary tracking-tight">
+                NE<span className="text-accent">X</span>US
+              </h1>
+              <span className="text-txt-muted text-[10px] tracking-[0.2em] font-medium uppercase hidden sm:inline-block">
+                Market
+              </span>
+            </div>
+          </div>
+        </div>
+      <ProfileDropdown/>
+      </header>
       {mobileMenuOpen && (
         <div className="fixed inset-0 top-14 z-40 bg-surface-primary border-t border-border-subtle animate-fade-in md:hidden flex flex-col overflow-y-auto pb-8">
-
-          {user && user.email ?  (
-            <div className="border-b border-border-subtle bg-surface-secondary">
-
-              {/* Trigger */}
-              <button
-                onClick={() => setIsMobileUserOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between p-4 hover:bg-surface-tertiary transition-colors"
-              >
-                <div className="flex items-center gap-3 z-100">
-                  <div className="w-10 h-10 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent font-bold text-lg uppercase">
-                    {user.userName.charAt(0)}
-                  </div>
-                  <div className="text-left">
-                    <div className="text-sm font-subheading text-txt-primary capitalize">
-                      {user.userName}
-                    </div>
-                    <div className="text-xs text-txt-secondary">
-                      {user.email}
-                      </div>
-                  </div>
-                </div>
-                <ChevronDownIcon
-                  size={16}
-                  className={`text-txt-muted transition-transform duration-200 ${isMobileUserOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {/* Dropdown */}
-              {isMobileUserOpen && (
-                <div className="mx-4 mb-3 border border-border-subtle rounded-sm overflow-hidden">
-                  {Menu.map((link, index) => (
-                    <Link
-                      key={index}
-                      href={link.link}
-                    >
-                      <button
-                        onClick={() => handleMobileNav(() => { })}
-                        className="w-full  flex items-center gap-2 px-4 py-3 text-sm text-txt-secondary hover:bg-surface-elevated transition-colors"
-                      >
-                        {link.icon}
-                        {link.name}
-                      </button>
-                      <div className="border-t border-border-subtle" />
-                    </Link>
-                  ))}
-                  <button
-                    onClick={() => handleMobileNav(logOut)}
-                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-500 hover:bg-surface-elevated transition-colors"
-                  >
-                    <LogOutIcon size={15} />
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="p-4 border-b border-border-subtle grid grid-cols-2 gap-3">
-              <Link
-                href='signin'
-                className="w-full text-sm font-semibold text-txt-primary bg-surface-tertiary border border-border-subtle px-4 py-2.5 rounded-sm"
-              >
-                Login
-              </Link>
-              <Link
-                href='signup'
-                className="w-full text-sm font-semibold text-accent border border-accent/30 px-4 py-2.5 rounded-sm"
-              >
-                Sign Up
-              </Link>
-            </div>
-          )}
-
           {/* Categories */}
           <div className="p-4">
             <h3 className="text-xs font-heading font-semibold text-txt-muted uppercase tracking-wider mb-3">
@@ -204,6 +129,7 @@ export function Header() {
           </div>
         </div>
       )}
+
     </>
   );
 }

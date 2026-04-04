@@ -201,7 +201,7 @@ export default function Dashboard({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Primary Balance Card - Takes up 2 columns on large screens */}
-        <div className="lg:col-span-2 bg-linear-to-br from-surface-tertiary to-surface-elevated border border-border-subtle rounded-sm p-8 relative overflow-hidden flex flex-col justify-between min-h-[200px]">
+        <div className="lg:col-span-2 bg-linear-to-br from-surface-tertiary to-surface-elevated border border-border-subtle rounded-sm p-8 relative overflow-hidden flex flex-col justify-between min-h-50">
           {/* Decorative background glow */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -252,7 +252,6 @@ export default function Dashboard({
           </Link>
         </div>
       </div>
-
       {/* Two Column Layout */}
       <div className="">
         {/* Quick Services — 1 col */}

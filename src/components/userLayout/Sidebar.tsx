@@ -10,10 +10,13 @@ import {
 
 const Sidebar = () => {
   const menuItems = [
-    { icon: <LayoutDashboard size={20} />, label: 'Dashboard', active: true },
-    { icon: <UserCircle size={20} />, label: 'Profile', active: false },
-    { icon: <Bell size={20} />, label: 'Notifications', active: false },
-    { icon: <ShieldCheck size={20} />, label: 'Security', active: false },
+    { icon: <LayoutDashboard size={20} />, label: 'Dashboard', link:"/user/dashboard", active: true },
+    { icon: <UserCircle size={20} />, label: 'Profile', link:'/user/profile', active: false },
+    { icon: <Bell size={20} />, link: '/user/accounts', labe: 'Buy-Logs', active: false },
+    { icon: <ShieldCheck size={20} />, label: 'SMS Numbers', link:'/user/sms-number', active: false },
+    { icon: <ShieldCheck size={20} />, label: 'Boost-Accounts', link:'/user/boost-accounts', active: false },
+    { icon: <ShieldCheck size={20} />, label: 'SMS Numbers', link:'sms-number', active: false },
+    { icon: <ShieldCheck size={20} />, label: 'SMS Numbers', link:'sms-number', active: false },
     { icon: <Settings size={20} />, label: 'Settings', active: false },
   ];
 
