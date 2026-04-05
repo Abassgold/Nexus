@@ -11,7 +11,6 @@ const Page = async ({
     const token = (await cookies()).get('accessToken')?.value;
     const { slug } = await params
     const res = await getListingBySlug(slug.trim())
-    console.log(res)
     if(!res.success) return <div>product not found</div>
     return (
         <>

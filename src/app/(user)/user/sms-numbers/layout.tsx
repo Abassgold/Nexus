@@ -3,7 +3,7 @@ import React from 'react'
 
 const SmsLayout = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div>SmsLayout
+        <div>
             {children}
             <div className='mt-6'>
             <SmsHistory />

@@ -45,88 +45,119 @@ const PurchaseNumberModal = (
   )
   return (
     <div className="p-4">
-      <div className="fixed inset-0 bg-black opacity-95  flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 relative">
-          <h2 className="text-teal-800 text-lg font-bold mb-6 text-center">
-            Number Purchase Details
-          </h2>
-          <div className="space-y-4 text-sm">
-            {/* Service */}
-            <div className="flex justify-between text-gray-900">
-              <span className="">Service:</span>
-              <span className="font-medium">{service}</span>
-            </div>
-            {/* Country */}
-            <div className="flex justify-between text-gray-900">
-              <span className="">Country:</span>
-              <span className="font-medium">{country}</span>
-            </div>
-            <div className="flex justify-between text-gray-900">
-              <span className="">Time-left:</span>
-              <span className="font-medium">{timeout}</span>
-            </div>
-            {/* Number */}
-            <div>
-              <div className="flex justify-between items-center text-gray-900">
-                <span className="text-gray-900">Number:</span>
-                <span className="font-medium flex gap-1 items-center">
-                  {number}
-                  <button
-                    onClick={() => copyToClipboard(number, 'number')}
-                    className="mt-1  text-teal-800 cursor-pointer"
-                  >
-                    {copiedField === 'number' ? 'Copied!' : <Copy size={20} />}
-                  </button>
-                </span>
-              </div>
+  {/* Modal Overlay - using a softer backdrop */}
+  <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    
+    {/* Main Modal Container */}
+    <div className="bg-surface-secondary border border-border-subtle rounded-sm shadow-2xl max-w-sm w-full p-6 relative">
+      
+      <h2 className="text-txt-primary text-lg font-bold mb-6 text-center border-b border-border-subtle pb-4">
+        Number Purchase Details
+      </h2>
 
-            </div>
+      <div className="space-y-4 text-sm">
+        {/* Service */}
+        <div className="flex justify-between text-txt-secondary">
+          <span>Service:</span>
+          <span className="font-semibold text-txt-primary uppercase">{service}</span>
+        </div>
 
-            {/* Status */}
-            <div className="flex justify-between text-gray-900">
-              <span className="">Status:</span>
-              <span className="font-medium">{otp ? 'OTP Received' : 'Waiting for OTP...'}</span>
-            </div>
+        {/* Country */}
+        <div className="flex justify-between text-txt-secondary">
+          <span>Country:</span>
+          <span className="font-medium text-txt-primary">{country}</span>
+        </div>
 
-            {/* OTP */}
-            {otp ? (
-              <div>
-                <div className="flex justify-between items-center text-gray-900">
-                  <span className="">OTP:</span>
-                  <span className="font-semibold text-green-700 flex items-center gap-1">
-                    {otp}
-                    <button
-                      onClick={() => copyToClipboard(otp, 'otp')}
-                      className="mt-1  text-teal-800  cursor-pointer"
-                    >
-                      {copiedField === 'otp' ? 'Copied!' : <Copy size={20}
-                      />}
-                    </button>
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="flex justify-between items-center animate-pulse text-gray-900">
-                <span className=" h-4 w-fit rounded">OTP:</span>
-                <span className="bg-gray-700 h-4 w-32 rounded"></span>
-              </div>
-            )}
+        {/* Time-left */}
+        <div className="flex justify-between text-txt-secondary">
+          <span>Time-left:</span>
+          <span className="font-mono text-accent">{timeout}</span>
+        </div>
+
+        {/* Number Section */}
+        <div className="pt-2 border-t border-border-subtle">
+          <div className="flex justify-between items-center">
+            <span className="text-txt-muted">Number:</span>
+            <div className="flex gap-2 items-center">
+              <span className="font-mono text-base text-txt-primary">{number}</span>
+              <button
+                onClick={() => copyToClipboard(number, 'number')}
+                className="p-1 hover:bg-surface-tertiary rounded-sm text-accent transition-colors cursor-pointer"
+                title="Copy Number"
+              >
+                {copiedField === 'number' ? 
+                  <span className="text-[10px] font-bold">COPIED</span> : 
+                  <Copy size={18} />
+                }
+              </button>
+            </div>
           </div>
-          {!otp || otp === '' ? <button className='mt-6 text-[13px] w-full cursor-pointer bg-red-800 text-white py-2 rounded-md'
-          onClick={canCel}
-          disabled={isCancelling}
-          >
-            {isCancelling ? 'Cancelling...' : 'Cancel'}
-          </button>: <button
-            onClick={done}
-            className={`mt-6 text-[13px] w-full cursor-pointer bg-accent text-white py-2 rounded-sm transition-colors`}
-          >
-            Done
-          </button>
-          }
+        </div>
+
+        {/* Status */}
+        <div className="flex justify-between items-center text-txt-secondary">
+          <span>Status:</span>
+          <span className={`text-[11px] px-2 py-0.5 rounded-sm font-bold uppercase border ${otp ? 'bg-stock-green/10 border-stock-green/20 text-stock-green' : 'bg-surface-tertiary border-border-subtle text-txt-muted'}`}>
+            {otp ? 'Success' : 'Waiting for OTP'}
+          </span>
+        </div>
+
+        {/* OTP Section */}
+        <div className="bg-surface-tertiary p-3 rounded-sm border border-border-subtle">
+          {otp ? (
+            <div className="flex justify-between items-center">
+              <span className="text-txt-muted">OTP Code:</span>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-lg text-stock-green tracking-widest">
+                  {otp}
+                </span>
+                <button
+                  onClick={() => copyToClipboard(otp, 'otp')}
+                  className="p-1 hover:bg-surface-secondary rounded-sm text-accent transition-colors cursor-pointer"
+                >
+                  {copiedField === 'otp' ? 
+                    <span className="text-[10px] font-bold">COPIED</span> : 
+                    <Copy size={18} />
+                  }
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-between items-center">
+              <span className="text-txt-muted">OTP:</span>
+              <div className="flex gap-1">
+                <div className="h-2 w-2 bg-accent rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                <div className="h-2 w-2 bg-accent rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                <div className="h-2 w-2 bg-accent rounded-full animate-bounce"></div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Action Buttons */}
+      <div className="mt-8">
+        {!otp || otp === '' ? (
+          <button 
+            className='w-full cursor-pointer bg-red-400/10 border border-red-400/20 text-red-400 hover:bg-red-400 hover:text-white py-2.5 rounded-sm text-xs font-bold transition-all uppercase'
+            onClick={canCel}
+            disabled={isCancelling}
+          >
+            {isCancelling ? 'Processing...' : 'Cancel Order'}
+          </button>
+        ) : (
+          <button
+            onClick={done}
+            className="w-full cursor-pointer bg-accent hover:bg-accent-hover text-white py-2.5 rounded-sm text-xs font-bold transition-all uppercase shadow-lg shadow-accent/20"
+          >
+            Done / Finished
+          </button>
+        )}
+      </div>
+
     </div>
+  </div>
+</div>
   );
 };
 

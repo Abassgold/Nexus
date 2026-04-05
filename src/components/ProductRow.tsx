@@ -9,6 +9,7 @@ interface ProductRowProps {
 }
 
 export function ProductRow({ product, index }: ProductRowProps) {
+  console.log(product)
   const id = 3;
   const router = useRouter();
   const isEven = index % 2 === 0;
@@ -57,7 +58,7 @@ export function ProductRow({ product, index }: ProductRowProps) {
       {/* Action */}
       <div className="flex items-center justify-end mt-2 md:mt-0">
         <button
-          onClick={e => router.push(`/user/accounts/${product.slug}`)}
+          onClick={e => router.push(`/user/accounts/${product.category.id}/${product.slug}`)}
           disabled={product.available_stock <= 0}
           className={`
             flex items-center gap-2 px-4 py-1.5 cursor-pointer rounded-sm text-xs font-semibold transition-all duration-150 w-full md:w-auto justify-center

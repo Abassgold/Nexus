@@ -377,7 +377,7 @@ const VirtualNumber = ({ countries, services, savedNumberStr: initialNumberStr }
     );
     return (
         <>
-            <section className='bg-surface-secondary border border-border-subtle rounded-sm shadow-2xl animate-fade-in flex flex-col'>
+            <section className='bg-surface-secondary border border-border-subtle rounded-sm shadow-2xl animate-fade-in flex flex-col gap-2'>
                 {loading && (
                     <PurchaseNumberModal
                         service={numberInfo?.name}
@@ -393,74 +393,72 @@ const VirtualNumber = ({ countries, services, savedNumberStr: initialNumberStr }
                 )}
 
                 {/* Country Selection */}
-                <div className="bg-surface-secondary border border-border-subtle rounded-sm shadow-2xl mb-2 text-txt-secondary">
-                    <div className='p-2'>
-                        <h1 className='py-2'>1. Select country</h1>
-                        {selectedCountry ? (
-
-                            <div className="flex items-center justify-between p-2   bg-surface-tertiary border border-border-subtle text-txt-secondary text-sm rounded-sm py-2.5">
-                                <p>{selectedCountry.eng}</p>
-                                <button
-                                    onClick={() => {
-                                        setSelectedCountry(null);
-                                        setSelectedService(null);
-                                        setHideServices(false);
-                                        setPrice(null);
-                                    }}
-                                    className="text-red-500 text-xl font-bold px-2 cursor-pointer"
-                                >×</button>
+                <div className="bg-surface-secondary border border-border-subtle rounded-sm p-2 text-txt-secondary">
+                    <h1 className='py-2 font-semibold text-txt-primary'>1. Select country</h1>
+                    {selectedCountry ? (
+                        <div className="flex items-center justify-between p-2 bg-surface-tertiary border border-border-subtle text-txt-primary text-sm rounded-sm py-2.5">
+                            <p>{selectedCountry.eng}</p>
+                            <button
+                                onClick={() => {
+                                    setSelectedCountry(null);
+                                    setSelectedService(null);
+                                    setHideServices(false);
+                                    setPrice(null);
+                                }}
+                                className="text-red-400 text-xl font-bold px-2 cursor-pointer hover:text-red-500"
+                            >
+                                &times;
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <input
+                                value={searchCountries}
+                                onChange={(e) => setSearchCountries(e.target.value)}
+                                placeholder='Search country'
+                                type="text"
+                                className='w-full bg-surface-tertiary border border-border-subtle text-txt-primary text-sm rounded-sm py-2.5 px-4 focus:outline-none focus:border-accent transition-all placeholder:text-txt-muted'
+                            />
+                            <div className="max-h-120 overflow-y-auto my-2 rounded-sm py-2">
+                                <ul>
+                                    {filteredCountries.map((country, index) => (
+                                        <li key={index} className='my-2'>
+                                            <label className='flex items-center gap-2 p-2 w-full cursor-pointer bg-surface-tertiary border border-border-subtle text-txt-secondary text-sm rounded-sm py-2.5 hover:border-accent/50 transition-colors'>
+                                                <input
+                                                    type="radio"
+                                                    name="country"
+                                                    value={country.eng}
+                                                    onChange={() => selectCountry(country)}
+                                                    className="accent-accent"
+                                                />
+                                                <p>{country.eng}</p>
+                                            </label>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                        ) : (
-                            <>
-                                <input
-                                    value={searchCountries}
-                                    onChange={(e) => setSearchCountries(e.target.value)}
-                                    placeholder='Search country'
-                                    type="text"
-                                    className='w-full bg-surface-tertiary border border-border-subtle text-txt-primary text-sm rounded-sm py-2.5 pl-10 pr-4 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all placeholder:text-txt-muted'
-                                />
-                                <div className="max-h-120 overflow-y-auto my-2 border-zinc-200 rounded-md py-2">
-                                    <ul>
-                                        {filteredCountries.map((country, index) => (
-                                            <li key={index} className='my-2'>
-                                                <label className='flex items-center gap-2 p-2 w-full cursor-pointer  bg-surface-tertiary border border-border-subtle text-txt-secondary text-sm rounded-sm py-2.5'>
-                                                    <input
-                                                        type="radio"
-                                                        name="country"
-                                                        value={country.eng}
-                                                        onChange={() => selectCountry(country)}
-                                                        className="accent-blue-500"
-                                                    />
-                                                    <p>{country.eng}</p>
-                                                </label>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </>
-                        )}
-                    </div>
+                        </>
+                    )}
                 </div>
 
                 {/* Service Selection */}
-                <div className='p-2 bg-surface-secondary border border-border-subtle rounded-sm shadow-2xl scroll-mt-24 text-txt-secondary'>
-                    <h1 className='py-2'>2. Select service</h1>
+                <div className='p-2 bg-surface-secondary border border-border-subtle rounded-sm text-txt-secondary'>
+                    <h1 className='py-2 font-semibold text-txt-primary'>2. Select service</h1>
 
                     <input
                         value={searchServices}
                         onChange={(e) => setSearchServices(e.target.value)}
                         placeholder='Search service'
                         type="text"
-                        className='w-full bg-surface-tertiary border border-border-subtle text-txt-primary text-sm rounded-sm py-2.5 pl-10 pr-4 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all placeholder:text-txt-muted'
+                        className='w-full bg-surface-tertiary border border-border-subtle text-txt-primary text-sm rounded-sm py-2.5 px-4 focus:outline-none focus:border-accent transition-all placeholder:text-txt-muted disabled:opacity-50'
                         disabled={!!selectedService}
                     />
 
                     {selectedService ? (
-                        <div className='my-4 pt-8 pb-4 px-4 relative   bg-surface-secondary border border-border-subtle rounded-sm'>
+                        <div className='my-4 pt-8 pb-4 px-4 relative bg-surface-tertiary border border-border-subtle rounded-sm'>
                             {priceLoading ? (
-                                <p>Loading prices...</p>
+                                <p className="text-xs text-txt-muted">Loading prices...</p>
                             ) : price !== null ? (
-
                                 <div className="">
                                     <div className="space-y-2 overflow-y-auto max-h-90">
                                         {price.availablePrices.map((item, index) => (
@@ -468,33 +466,35 @@ const VirtualNumber = ({ countries, services, savedNumberStr: initialNumberStr }
                                                 <button
                                                     disabled={loading}
                                                     onClick={() => purchaseNumber({ ...item })}
-                                                    className="flex w-full items-center justify-between text-[14px] cursor-pointer gap-3 bg-accent text-surface-primary rounded-sm py-2 px-3 transition-colors"
+                                                    className="flex w-full items-center justify-between text-[14px] cursor-pointer gap-3 bg-accent hover:bg-accent-hover text-white rounded-sm py-2 px-3 transition-colors shadow-sm"
                                                 >
-                                                    <h2 className='text-[12px] font-semibold'>{selectedService.name}</h2>
-                                                    <p className="text-[11px]">Stock: {item.stock ?? 0}</p>
-                                                    <div className="flex gap-1 items-center">
+                                                    <h2 className='text-[12px] font-bold uppercase'>{selectedService.name}</h2>
+                                                    <p className="text-[11px] opacity-90">Stock: {item.stock ?? 0}</p>
+                                                    <div className="flex gap-1 items-center font-bold">
                                                         <p>₦{item.cost}</p>
-                                                        <ShoppingCart size={16} />
+                                                        <ShoppingCart size={14} />
                                                     </div>
                                                 </button>
                                             </div>
                                         ))}
                                     </div>
 
-                                    <div className="bg-yellow-100 my-3 text-yellow-800 p-3 rounded-md text-sm">
-                                         <strong>Note:</strong> Kindly click on any <strong>price above</strong> to receive your number and code. Turn your VPN <strong>on or off</strong> if needed to get your SMS. No code? You&apos;ll get a <strong>full refund</strong>. We aren&apos;t responsible for issues after you receive your code, such as account bans on WhatsApp, Telegram or other platforms. <strong>The higher the price, the higher the success rate.</strong>
+                                    <div className="bg-surface-primary border border-border-subtle my-3 text-txt-secondary p-3 rounded-sm text-[11px] leading-relaxed">
+                                        <strong className="text-accent uppercase">Note:</strong> Kindly click on any <strong className="text-txt-primary text-xs">price button</strong> to receive your number. VPN usage may affect SMS delivery. If no code is received, a <strong className="text-stock-green">full refund</strong> is issued. Higher prices generally offer better success rates.
                                     </div>
                                 </div>
                             ) : (
-                                <p>No price available</p>
+                                <p className="text-xs text-txt-muted">No price available</p>
                             )}
                             <button
                                 onClick={() => { setSelectedService(null); setPrice(null); }}
-                                className='text-red-500 text-xl font-bold px-2 absolute top-0 right-1 cursor-pointer'
-                            >×</button>
+                                className='text-red-400 text-xl font-bold px-2 absolute top-1 right-1 cursor-pointer hover:text-red-500'
+                            >
+                                &times;
+                            </button>
                         </div>
                     ) : (
-                        <div className="max-h-120 overflow-y-auto my-2 border-zinc-200 rounded-md py-2">
+                        <div className="max-h-120 overflow-y-auto my-2 rounded-sm py-2">
                             {hideServices && (
                                 <ul>
                                     {filteredServices.map((service, index) => (
@@ -502,10 +502,10 @@ const VirtualNumber = ({ countries, services, savedNumberStr: initialNumberStr }
                                             <button
                                                 type="button"
                                                 onClick={() => selectService(service)}
-                                                className='flex items-center justify-between rounded-md p-1 border border-zinc-200 w-full cursor-pointer'
+                                                className='flex items-center justify-between rounded-sm p-3 border border-border-subtle bg-surface-tertiary w-full cursor-pointer hover:border-accent/50 transition-colors text-sm text-txt-secondary'
                                             >
                                                 <div className='flex items-center gap-2'>
-                                                    <input type="radio" name="service" readOnly />
+                                                    <div className="w-3 h-3 border border-border-subtle rounded-full" />
                                                     <p>{service.name}</p>
                                                 </div>
                                             </button>
