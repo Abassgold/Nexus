@@ -3,11 +3,56 @@ import axios from 'axios';
 
 const API_URL = `${process.env.NEXT_PUBLIC_ACCS_ZONE_BASE_URL}`;
 const API_KEY = `${process.env.NEXT_PUBLIC_ACCS_ZONE_API_KEY}`;
+const BASE_URL = process.env.NEXT_PUBLIC_ACCSMTP_DOMAIN;
+const USERNAME = process.env.NEXT_PUBLIC_ACCSMTP_USERNAME;
+const PASSWORD = process.env.NEXT_PUBLIC_ACCSMTP_PASSWORD;
 
 const headers = {
   'X-API-Key': API_KEY,
   'Content-Type': 'application/json',
 };
+
+export interface MTPAccount {
+  id: string;
+  name: string;
+  price: string;
+  amount: number;
+  country: string;
+  description: string;
+}
+
+export interface MTPCategory {
+  id: string;
+  name: string;
+  image: string;
+  accounts: MTPAccount[];
+}
+
+export interface MTPListResourceResponse {
+  status: string;
+  categories: MTPCategory[];
+}
+
+export interface MTPPurchaseItem {
+  account: string;
+}
+
+export interface MTPPurchaseResponse {
+  status: string;
+  msg: string;
+  data: {
+    trans_id: string;
+    category: string;
+    name: string;
+    amount: string;
+    time: number;
+    lists: MTPPurchaseItem[];
+  };
+}
+
+
+
+
 
 export type Cat = {
   id: number;
@@ -128,3 +173,41 @@ export const purchase = async (payload: PurchasePayload): Promise<PurchaseResult
   );
   return data;
 };
+
+
+
+// server2
+
+const api = axios.create({
+  baseURL: `${BASE_URL}/api`,
+  params: {
+    username: USERNAME,
+    password: PASSWORD,
+  },
+});
+
+export async function listResources(): Promise<MTPListResourceResponse> {
+  const { data } = await api.get("ListResource.php");
+  return data;
+}
+
+export async function getProductInfo(id: string) {
+  const { data } = await api.get("InfoResource.php", {
+    params: { id },
+  });
+  return data;
+}
+
+export async function purchaseResource(id: string, amount: string): Promise<MTPPurchaseResponse> {
+  const { data } = await api.get("BResource.php", {
+    params: { id, amount },
+  });
+  return data;
+}
+
+export async function getBalance(): Promise<string> {
+  const { data } = await api.get("GetBalance.php", {
+    responseType: "text",
+  });
+  return data;
+}
